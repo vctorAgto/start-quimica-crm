@@ -74,6 +74,28 @@ button { font-family: inherit; cursor: pointer; }
 }
 .azulia-teaser b { color: #fff; display: block; margin-bottom: 4px; font-size: 13px; }
 
+.user-card-wrap { position: relative; margin-top: 10px; }
+.user-card {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px;
+    background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); border-radius: 12px;
+    cursor: pointer; text-align: left;
+}
+.user-card:hover { background: rgba(255, 255, 255, .09); }
+.user-avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--cyan));
+    color: #fff; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.user-card-name { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-card-role { font-size: 11px; color: #8ea0b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-card-caret { color: #8ea0b8; font-size: 11px; flex-shrink: 0; }
+.user-menu {
+    position: absolute; bottom: calc(100% + 6px); left: 0; right: 0; background: #16304d; border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px; padding: 6px; box-shadow: 0 10px 24px rgba(0, 0, 0, .3); z-index: 20;
+}
+.user-menu-item { display: block; padding: 8px 10px; border-radius: 8px; color: #dbe6f2; font-size: 13px; font-weight: 600; text-decoration: none; }
+.user-menu-item:hover { background: rgba(255, 255, 255, .08); }
+
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .content-header {
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;

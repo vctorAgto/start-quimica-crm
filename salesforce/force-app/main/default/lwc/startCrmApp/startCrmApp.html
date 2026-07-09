@@ -18,6 +18,22 @@
                 <b>✦ Azul<span class="brand-ia">IA</span></b>
                 4 ações de alto impacto sugeridas para a equipe hoje.
             </div>
+
+            <div class="user-card-wrap">
+                <template if:true={profileMenuOpen}>
+                    <div class="user-menu">
+                        <a href={logoutUrl} class="user-menu-item">↪ Sair</a>
+                    </div>
+                </template>
+                <button class="user-card" onclick={toggleProfileMenu}>
+                    <span class="user-avatar">{userInitials}</span>
+                    <span class="user-card-text">
+                        <span class="user-card-name">{currentUser.name}</span>
+                        <span class="user-card-role">{currentUser.profileName}</span>
+                    </span>
+                    <span class="user-card-caret">^</span>
+                </button>
+            </div>
         </aside>
 
         <div class="main">

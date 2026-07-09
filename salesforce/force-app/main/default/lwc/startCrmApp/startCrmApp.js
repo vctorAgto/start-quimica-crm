@@ -2,6 +2,7 @@ import { LightningElement, track, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import getAccounts from '@salesforce/apex/StartCrmController.getAccounts';
 import createAccount from '@salesforce/apex/StartCrmController.createAccount';
+import getCurrentUserInfo from '@salesforce/apex/StartCrmController.getCurrentUserInfo';
 import getRcaDetail from '@salesforce/apex/StartCrmController.getRcaDetail';
 import getOpportunityDetail from '@salesforce/apex/StartCrmController.getOpportunityDetail';
 import STARTLOGO from '@salesforce/resourceUrl/startLogo';
@@ -86,6 +87,32 @@ const PROSPECCOES = [
 
 export default class StartCrmApp extends LightningElement {
     logoUrl = STARTLOGO;
+
+    @track currentUser = { name: '', profileName: '' };
+    @track profileMenuOpen = false;
+
+    @wire(getCurrentUserInfo)
+    wiredCurrentUser({ data }) {
+        if (data) {
+            this.currentUser = data;
+        }
+    }
+
+    get userInitials() {
+        const parts = (this.currentUser.name || '').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return '?';
+        return parts.length === 1 ? parts[0].charAt(0).toUpperCase() : (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+    }
+
+    get logoutUrl() {
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        const base = parts.length ? '/' + parts[0] : '';
+        return base + '/secur/logout.jsp';
+    }
+
+    toggleProfileMenu() {
+        this.profileMenuOpen = !this.profileMenuOpen;
+    }
 
     @track dpage = 'dashboard';
     @track dperiod = 'Mês';

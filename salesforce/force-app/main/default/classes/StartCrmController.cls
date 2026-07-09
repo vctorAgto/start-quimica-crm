@@ -19,6 +19,27 @@ public with sharing class StartCrmController {
         }
     }
 
+    public class UserInfoWrapper {
+        @AuraEnabled public String name;
+        @AuraEnabled public String profileName;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static UserInfoWrapper getCurrentUserInfo() {
+        UserInfoWrapper w = new UserInfoWrapper();
+        w.name = UserInfo.getName();
+        w.profileName = '';
+        try {
+            List<Profile> matches = [SELECT Name FROM Profile WHERE Id = :UserInfo.getProfileId() LIMIT 1];
+            if (!matches.isEmpty()) {
+                w.profileName = matches[0].Name;
+            }
+        } catch (Exception ex) {
+            // Sem acesso ao objeto Profile para este tipo de licença — segue sem subtítulo.
+        }
+        return w;
+    }
+
     @AuraEnabled(cacheable=true)
     public static List<Account> getAccounts() {
         return [
