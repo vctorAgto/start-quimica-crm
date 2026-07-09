@@ -1,0 +1,261 @@
+<template>
+    <div class="topstrip">
+        <span class="brand">🧪 Start CRM <span class="brand-ia">+ AzulIA</span></span>
+    </div>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand-box"><span class="logo">S</span> Start CRM</div>
+            <nav>
+                <template for:each={navItemsView} for:item="n">
+                    <a key={n.id} class={n.cssClass} data-page={n.id} onclick={handleNav}>
+                        <span class="ic">{n.ic}</span>{n.label}
+                    </a>
+                </template>
+            </nav>
+            <div class="azulia-teaser" data-page="cockpit" onclick={handleNav}>
+                <b>✦ Azul<span class="brand-ia">IA</span></b>
+                4 ações de alto impacto sugeridas para a equipe hoje.
+            </div>
+        </aside>
+
+        <div class="main">
+            <!-- ============ DASHBOARD ============ -->
+            <template if:true={isDashboard}>
+                <div class="content-header">
+                    <div><h1>Dashboard comercial</h1><div class="meta">Junho 2026 · Região Triângulo Mineiro · 18 RCAs</div></div>
+                    <div class="seg-toggle">
+                        <template for:each={periodsView} for:item="p">
+                            <button key={p.label} class={p.cssClass} data-period={p.label} onclick={handlePeriod}>{p.label}</button>
+                        </template>
+                    </div>
+                </div>
+                <div class="content-body">
+                    <div class="grid kpis">
+                        <div class="card kpi"><div class="label">Meta do mês</div><div class="value">72%</div><div class="muted small">R$ 2,16M de R$ 3,0M</div><div class="delta up">▲ +6 p.p. vs maio</div></div>
+                        <div class="card kpi"><div class="label">Pipeline</div><div class="value">R$ 1,24M</div><div class="muted small">38 oportunidades</div><div class="delta up">▲ +12%</div></div>
+                        <div class="card kpi"><div class="label">Visitas</div><div class="value">248 / 310</div><div class="muted small">80% do planejado</div><div class="delta flat">▬ no ritmo</div></div>
+                        <div class="card kpi"><div class="label">Cobertura</div><div class="value">79%</div><div class="muted small">carteira visitada/mês</div><div class="delta up">▲ +4 p.p.</div></div>
+                        <div class="card kpi"><div class="label">Churn</div><div class="value churn-red">4,2%</div><div class="muted small">18 contas em risco</div><div class="delta up">▼ -0,6 p.p.</div></div>
+                    </div>
+                    <div class="row2">
+                        <div class="card">
+                            <h3>Ranking de RCAs</h3><div class="subtitle">Top desempenho no período</div>
+                            <template for:each={rankingTop5View} for:item="r">
+                                <div key={r.key} class={r.rowClass}>
+                                    <div class="pos">{r.pos}</div>
+                                    <div class="who"><b>{r.nome}</b><span>{r.regiao}</span></div>
+                                    <div class="bar-wrap"><div class="bar" style={r.barStyle}></div></div>
+                                    <div class="val">{r.valor}</div>
+                                </div>
+                            </template>
+                            <div class="mt12"><a class="chip" data-page="ranking" onclick={handleNav}>Ver ranking completo →</a></div>
+                        </div>
+                        <div class="card">
+                            <h3>Mapa de mercado</h3><div class="subtitle">Triângulo MG</div>
+                            <div class="minimap">
+                                <template for:each={miniMapDots} for:item="d">
+                                    <div key={d.nome} class="dot" style={d.style} title={d.nome}></div>
+                                </template>
+                            </div>
+                            <div class="legend">
+                                <span><i class="dot-ativo"></i>Ativos</span>
+                                <span><i class="dot-atencao"></i>Atenção</span>
+                                <span><i class="dot-risco"></i>Em risco</span>
+                                <span><i class="dot-prospeccao"></i>Prospecção</span>
+                            </div>
+                            <div class="mt12"><a class="chip" data-page="mapa" onclick={handleNav}>Ver mapa completo →</a></div>
+                        </div>
+                    </div>
+                    <div class="row3">
+                        <div class="stat-box"><div class="lbl">Clientes sem visita</div><div class="num">34</div><div class="sub">há +30 dias</div></div>
+                        <div class="stat-box"><div class="lbl">Reativações</div><div class="num">9</div><div class="sub">no mês · R$ 188k</div></div>
+                        <div class="stat-box"><div class="lbl">Cross-sell</div><div class="num">23</div><div class="sub">conversões via AzulIA</div></div>
+                        <div class="stat-box cta" data-page="cockpit" onclick={handleNav}><div class="lbl">✦ Cockpit de IA</div><div class="num">4 ações de alto impacto</div><div class="sub sub-light">ver recomendações →</div></div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ============ COCKPIT DE IA ============ -->
+            <template if:true={isCockpit}>
+                <div class="content-header">
+                    <div><h1>✦ Cockpit Azul<span class="brand-ia">IA</span></h1><div class="meta">Recomendações priorizadas por impacto · atualizado há 8 min</div></div>
+                    <div class="seg-toggle">
+                        <button class="seg-btn" data-tab="cartoes" onclick={handleCockpitTab}>Cartões</button>
+                        <button class="seg-btn" data-tab="fila" onclick={handleCockpitTab}>Fila priorizada</button>
+                    </div>
+                </div>
+                <div class="content-body">
+                    <div class="cockpit-top">
+                        <div class="card highlight"><div class="label label-light">Impacto projetado</div><div class="num">R$ 382k/ano</div></div>
+                        <div class="card"><div class="label">Ações sugeridas</div><div class="num">4</div></div>
+                        <div class="card"><div class="label">Churn evitável</div><div class="num churn-red">R$ 96k</div></div>
+                        <div class="card"><div class="label">Confiança média</div><div class="num churn-green">High</div></div>
+                    </div>
+
+                    <template if:true={cockpitIsCartoes}>
+                        <div class="reco-grid">
+                            <template for:each={recosView} for:item="r">
+                                <div key={r.id} class={r.cardClass}>
+                                    <div class="tag">{r.tag}</div><h4>{r.titulo}</h4><p>{r.desc}</p>
+                                    <div class="foot">
+                                        <span class="impact">{r.impacto}</span>
+                                        <template if:true={r.isDone}><span class="done-badge">✓ Concluído</span></template>
+                                        <template if:false={r.isDone}><button class="btn sm" data-id={r.id} data-label={r.cta} onclick={handleMarkReco}>{r.cta}</button></template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <template if:true={cockpitIsFila}>
+                        <div>
+                            <template for:each={recosView} for:item="r">
+                                <div key={r.id} class={r.queueClass} style={r.queueStyle}>
+                                    <div class="body"><div class="tag">{r.tag}</div><h4>{r.titulo}</h4><p>{r.desc}</p></div>
+                                    <div class="impact" style={r.impactStyle}>{r.impacto}</div>
+                                    <template if:true={r.isDone}><span class="done-badge">✓ Concluído</span></template>
+                                    <template if:false={r.isDone}><button class="btn sm" data-id={r.id} data-label={r.cta} onclick={handleMarkReco}>{r.cta}</button></template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:true={hasActivities}>
+                        <div class="activity-feed">
+                            <h4>Últimas ações registradas</h4>
+                            <template for:each={activities} for:item="a">
+                                <div key={a.id} class="activity-item"><span class="dot-cyan"></span><div>{a.msg} <span class="muted small">{a.time}</span></div></div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- ============ EQUIPE & CARTEIRA ============ -->
+            <template if:true={isEquipe}>
+                <div class="content-header"><div><h1>Equipe &amp; carteira</h1><div class="meta">4 Diretores Regionais · 60 Gerentes de Mercado · 750 RCAs</div></div></div>
+                <div class="content-body">
+                    <div class="card">
+                        <h3>Região Triângulo Mineiro</h3><div class="subtitle">18 RCAs sob gestão de Carlos Eduardo (Gerente de Mercado)</div>
+                        <table>
+                            <thead><tr><th>RCA</th><th>Carteira</th><th>Clientes ativos</th><th>Cobertura</th><th>Meta do mês</th><th>Churn</th></tr></thead>
+                            <tbody>
+                                <template for:each={equipeRows} for:item="r">
+                                    <tr key={r.key}>
+                                        <td><b>{r.nome}</b></td><td class="muted">{r.regiao}</td>
+                                        <td>{r.carteira}</td>
+                                        <td>{r.cobertura}</td>
+                                        <td>{r.meta}</td>
+                                        <td style={r.churnStyle}>{r.churn}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card mt14">
+                        <h3>Contas reais desta org (Salesforce)</h3>
+                        <div class="subtitle">Registros ao vivo via Apex · objeto Account</div>
+                        <template if:true={hasRealAccounts}>
+                            <table>
+                                <thead><tr><th>Conta</th><th>Cidade/UF</th><th>Segmento</th><th>Faturamento</th></tr></thead>
+                                <tbody>
+                                    <template for:each={realAccountsView} for:item="a">
+                                        <tr key={a.Id}>
+                                            <td><b>{a.Name}</b></td>
+                                            <td class="muted">{a.location}</td>
+                                            <td>{a.industry}</td>
+                                            <td>{a.revenue}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template if:false={hasRealAccounts}>
+                            <p class="muted small">Nenhuma conta encontrada nesta org. Crie algumas Accounts de teste no Salesforce pra elas aparecerem aqui automaticamente.</p>
+                        </template>
+                        <template if:true={hasAccountsError}>
+                            <p class="muted small">Não foi possível carregar as contas — verifique se o usuário da comunidade tem permissão de leitura em Account e acesso à classe Apex StartCrmController.</p>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ============ MAPA DE MERCADO ============ -->
+            <template if:true={isMapa}>
+                <div class="content-header"><div><h1>Mapa de mercado</h1><div class="meta">Triângulo Mineiro · carteira ativa e oportunidades de prospecção</div></div></div>
+                <div class="content-body">
+                    <div class="row3 mb14">
+                        <div class="stat-box"><div class="lbl churn-green">● Ativos</div><div class="num">{mapaCounts.ativo}</div><div class="sub">contas saudáveis</div></div>
+                        <div class="stat-box"><div class="lbl lbl-amber">● Atenção</div><div class="num">{mapaCounts.atencao}</div><div class="sub">acompanhar de perto</div></div>
+                        <div class="stat-box"><div class="lbl churn-red">● Em risco</div><div class="num">{mapaCounts.risco}</div><div class="sub">churn elevado</div></div>
+                        <div class="stat-box"><div class="lbl lbl-blue">● Prospecção</div><div class="num">{mapaCounts.prospeccao}</div><div class="sub">sem fornecedor ativo</div></div>
+                    </div>
+                    <div class="row2">
+                        <div class="card">
+                            <h3>Distribuição geográfica</h3><div class="subtitle">Clique em um ponto para ver detalhes</div>
+                            <div class="minimap minimap-lg">
+                                <template for:each={mapaPontosView} for:item="p">
+                                    <div key={p.idx} class="dot" style={p.style} title={p.nome} data-idx={p.idx} onclick={handleMapaSelect}></div>
+                                </template>
+                            </div>
+                            <div class="legend">
+                                <span><i class="dot-ativo"></i>Ativos ({mapaCounts.ativo})</span>
+                                <span><i class="dot-atencao"></i>Atenção ({mapaCounts.atencao})</span>
+                                <span><i class="dot-risco"></i>Em risco ({mapaCounts.risco})</span>
+                                <span><i class="dot-prospeccao"></i>Prospecção ({mapaCounts.prospeccao})</span>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <template if:true={hasSelectedPoint}>
+                                <h3>{selectedPointView.nome}</h3>
+                                <div class="subtitle">{selectedPointView.cidade}</div>
+                                <div class="detail-block">
+                                    <div class="detail-row"><span class="muted">Status</span><b style={selectedPointView.statusStyle}>{selectedPointView.statusLabel}</b></div>
+                                    <div class="detail-row no-border"><span class="muted">{selectedPointView.fatLabel}</span><b>{selectedPointView.fat}</b></div>
+                                </div>
+                            </template>
+                            <template if:false={hasSelectedPoint}>
+                                <h3>Selecione um ponto no mapa</h3>
+                                <p class="muted small">Veja o status de cada conta e identifique oportunidades de prospecção por região.</p>
+                            </template>
+                            <hr class="hr" />
+                            <h3 class="h3-sm">✦ Oportunidades de prospecção</h3>
+                            <div class="subtitle">Mapeamento AzulIA · alta propensão de conversão</div>
+                            <template for:each={prospeccoes} for:item="o">
+                                <div key={o.nome} class="prospect-row">
+                                    <div class="prospect-top"><b>{o.nome}</b><span class="prospect-valor">{o.valor}</span></div>
+                                    <div class="muted small">{o.cidade} · {o.motivo}</div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ============ RANKING ============ -->
+            <template if:true={isRanking}>
+                <div class="content-header">
+                    <div><h1>Ranking de RCAs</h1><div class="meta">Região Triângulo Mineiro · Junho 2026</div></div>
+                    <div class="seg-toggle">
+                        <template for:each={periodsView} for:item="p">
+                            <button key={p.label} class={p.cssClass} data-period={p.label} onclick={handlePeriod}>{p.label}</button>
+                        </template>
+                    </div>
+                </div>
+                <div class="content-body">
+                    <div class="card">
+                        <template for:each={rankingFullView} for:item="r">
+                            <div key={r.key} class={r.rowClass}>
+                                <div class="pos">{r.pos}</div>
+                                <div class="who"><b>{r.nome}</b><span>{r.regiao}</span></div>
+                                <div class="bar-wrap"><div class="bar" style={r.barStyle}></div></div>
+                                <div class="val">{r.valor}</div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>
