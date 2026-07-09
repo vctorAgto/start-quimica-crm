@@ -10,10 +10,28 @@ public with sharing class StartCrmController {
     }
 
     public class OppWrapper {
+        @AuraEnabled public String id;
         @AuraEnabled public String name;
         @AuraEnabled public String stage;
         @AuraEnabled public Decimal amount;
         @AuraEnabled public String closeDate;
+    }
+
+    public class TaskWrapper {
+        @AuraEnabled public String subject;
+        @AuraEnabled public String status;
+        @AuraEnabled public String activityDate;
+        @AuraEnabled public String whoName;
+    }
+
+    public class OpportunityDetailWrapper {
+        @AuraEnabled public String oppId;
+        @AuraEnabled public String name;
+        @AuraEnabled public String stage;
+        @AuraEnabled public Decimal amount;
+        @AuraEnabled public String closeDate;
+        @AuraEnabled public String accountName;
+        @AuraEnabled public List<TaskWrapper> activities;
     }
 
     public class RcaDetailWrapper {
@@ -59,12 +77,13 @@ public with sharing class StartCrmController {
 
         List<OppWrapper> ows = new List<OppWrapper>();
         for (Opportunity o : [
-            SELECT Name, StageName, Amount, CloseDate
+            SELECT Id, Name, StageName, Amount, CloseDate
             FROM Opportunity
             WHERE RCA__c = :contactId
             ORDER BY CloseDate ASC
         ]) {
             OppWrapper ow = new OppWrapper();
+            ow.id = o.Id;
             ow.name = o.Name;
             ow.stage = o.StageName;
             ow.amount = o.Amount;
@@ -72,6 +91,49 @@ public with sharing class StartCrmController {
             ows.add(ow);
         }
         w.opportunities = ows;
+        return w;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static OpportunityDetailWrapper getOpportunityDetail(Id oppId) {
+        if (oppId == null) {
+            return null;
+        }
+        List<Opportunity> matches = [
+            SELECT Id, Name, StageName, Amount, CloseDate, Account.Name
+            FROM Opportunity
+            WHERE Id = :oppId
+            LIMIT 1
+        ];
+        if (matches.isEmpty()) {
+            return null;
+        }
+        Opportunity o = matches[0];
+
+        OpportunityDetailWrapper w = new OpportunityDetailWrapper();
+        w.oppId = o.Id;
+        w.name = o.Name;
+        w.stage = o.StageName;
+        w.amount = o.Amount;
+        w.closeDate = o.CloseDate != null ? o.CloseDate.format() : null;
+        w.accountName = o.Account != null ? o.Account.Name : null;
+
+        List<TaskWrapper> tasks = new List<TaskWrapper>();
+        for (Task t : [
+            SELECT Subject, Status, ActivityDate, Who.Name
+            FROM Task
+            WHERE WhatId = :oppId
+            ORDER BY ActivityDate DESC NULLS LAST
+            LIMIT 10
+        ]) {
+            TaskWrapper tw = new TaskWrapper();
+            tw.subject = t.Subject;
+            tw.status = t.Status;
+            tw.activityDate = t.ActivityDate != null ? t.ActivityDate.format() : null;
+            tw.whoName = t.Who != null ? t.Who.Name : null;
+            tasks.add(tw);
+        }
+        w.activities = tasks;
         return w;
     }
 }

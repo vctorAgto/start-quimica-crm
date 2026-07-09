@@ -1,6 +1,7 @@
 import { LightningElement, track, wire } from 'lwc';
 import getAccounts from '@salesforce/apex/StartCrmController.getAccounts';
 import getRcaDetail from '@salesforce/apex/StartCrmController.getRcaDetail';
+import getOpportunityDetail from '@salesforce/apex/StartCrmController.getOpportunityDetail';
 import STARTLOGO from '@salesforce/resourceUrl/startLogo';
 
 const STATUS_META = {
@@ -8,6 +9,30 @@ const STATUS_META = {
     atencao: { cor: '#d9891f', label: 'Atenção' },
     risco: { cor: '#dd3b3b', label: 'Em risco' },
     prospeccao: { cor: '#2f6fed', label: 'Prospecção' },
+};
+
+const PERIOD_KPIS = {
+    'Mês': {
+        metaPct: '72%', metaSub: 'R$ 2,16M de R$ 3,0M', metaDelta: '▲ +6 p.p. vs maio',
+        pipeline: 'R$ 1,24M', pipelineSub: '38 oportunidades', pipelineDelta: '▲ +12%',
+        visitas: '248 / 310', visitasSub: '80% do planejado', visitasDelta: '▬ no ritmo',
+        cobertura: '79%', coberturaSub: 'carteira visitada/mês', coberturaDelta: '▲ +4 p.p.',
+        churnPct: '4,2%', churnSub: '18 contas em risco', churnDelta: '▼ -0,6 p.p.',
+    },
+    'Trimestre': {
+        metaPct: '81%', metaSub: 'R$ 7,29M de R$ 9,0M', metaDelta: '▲ +3 p.p. vs trim. anterior',
+        pipeline: 'R$ 3,58M', pipelineSub: '104 oportunidades', pipelineDelta: '▲ +18%',
+        visitas: '712 / 930', visitasSub: '77% do planejado', visitasDelta: '▬ no ritmo',
+        cobertura: '84%', coberturaSub: 'carteira visitada/trim.', coberturaDelta: '▲ +6 p.p.',
+        churnPct: '5,1%', churnSub: '22 contas em risco', churnDelta: '▲ +0,3 p.p.',
+    },
+    'Ano': {
+        metaPct: '68%', metaSub: 'R$ 24,5M de R$ 36,0M', metaDelta: '▲ +9 p.p. vs ano anterior',
+        pipeline: 'R$ 11,2M', pipelineSub: '312 oportunidades', pipelineDelta: '▲ +21%',
+        visitas: '2.480 / 3.720', visitasSub: '67% do planejado', visitasDelta: '▼ abaixo do ritmo',
+        cobertura: '73%', coberturaSub: 'carteira visitada/ano', coberturaDelta: '▲ +2 p.p.',
+        churnPct: '6,4%', churnSub: '31 contas em risco', churnDelta: '▲ +1,1 p.p.',
+    },
 };
 
 const NAV_ITEMS = [
@@ -130,6 +155,9 @@ export default class StartCrmApp extends LightningElement {
     handlePeriod(event) {
         this.dperiod = event.currentTarget.dataset.period;
     }
+    get kpis() {
+        return PERIOD_KPIS[this.dperiod];
+    }
 
     // ---------- dashboard mini map ----------
     get miniMapDots() {
@@ -222,11 +250,49 @@ export default class StartCrmApp extends LightningElement {
         if (!this.rcaDetail || !this.rcaDetail.opportunities) return [];
         return this.rcaDetail.opportunities.map((o, i) => ({
             key: i,
+            oppId: o.id,
             name: o.name,
             stage: o.stage,
             amountFmt: o.amount ? this.formatCurrency(o.amount) : '—',
             closeDate: o.closeDate,
         }));
+    }
+
+    // ---------- opportunity detail (real Salesforce data) ----------
+    get isOppDetail() { return this.dpage === 'oppDetail'; }
+    @track selectedOppId = null;
+    @track oppDetail = null;
+    @track oppDetailError = null;
+
+    @wire(getOpportunityDetail, { oppId: '$selectedOppId' })
+    wiredOppDetail({ data, error }) {
+        if (data) {
+            this.oppDetail = data;
+            this.oppDetailError = null;
+        } else if (error) {
+            this.oppDetailError = error;
+            this.oppDetail = null;
+        }
+    }
+    get hasOppDetail() { return !!this.oppDetail; }
+    handleOpenOpp(event) {
+        event.stopPropagation();
+        this.selectedOppId = event.currentTarget.dataset.oppId;
+        this.dpage = 'oppDetail';
+    }
+    get oppActivitiesView() {
+        if (!this.oppDetail || !this.oppDetail.activities) return [];
+        return this.oppDetail.activities.map((t, i) => ({
+            key: i,
+            subject: t.subject,
+            status: t.status,
+            activityDate: t.activityDate || '—',
+            whoName: t.whoName || '—',
+        }));
+    }
+    get hasOppActivities() { return this.oppActivitiesView.length > 0; }
+    get oppAmountFmt() {
+        return this.oppDetail && this.oppDetail.amount ? this.formatCurrency(this.oppDetail.amount) : '—';
     }
 
     // ---------- mapa de mercado ----------

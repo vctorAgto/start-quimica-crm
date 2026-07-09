@@ -180,6 +180,9 @@ table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; color: var(--gray-600); padding: 8px 10px; border-bottom: 2px solid var(--gray-100); }
 td { padding: 11px 10px; border-bottom: 1px solid var(--gray-100); }
 tr:last-child td { border-bottom: 0; }
+.rca-opp-row { cursor: pointer; }
+.rca-opp-row:hover { background: var(--gray-50); }
+.link { color: var(--blue); }
 
 /* ---------- activity feed ---------- */
 .activity-feed { margin-top: 18px; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
