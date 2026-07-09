@@ -1,5 +1,6 @@
 import { LightningElement, track, wire } from 'lwc';
 import getAccounts from '@salesforce/apex/StartCrmController.getAccounts';
+import getRcaDetail from '@salesforce/apex/StartCrmController.getRcaDetail';
 import STARTLOGO from '@salesforce/resourceUrl/startLogo';
 
 const STATUS_META = {
@@ -18,14 +19,14 @@ const NAV_ITEMS = [
 ];
 
 const RANKING = [
-    { pos: 1, nome: 'Ana Beatriz', regiao: 'BH Capital', valor: 'R$ 512k', pct: 100, me: false },
-    { pos: 2, nome: 'Carlos Eduardo', regiao: 'Triângulo', valor: 'R$ 420k', pct: 82, me: true },
-    { pos: 3, nome: 'Rafael Souza', regiao: 'Sul de Minas', valor: 'R$ 388k', pct: 76, me: false },
-    { pos: 4, nome: 'Letícia Alves', regiao: 'Norte', valor: 'R$ 311k', pct: 61, me: false },
-    { pos: 5, nome: 'Bruno Lima', regiao: 'Vale do Aço', valor: 'R$ 287k', pct: 56, me: false },
-    { pos: 6, nome: 'Marina Costa', regiao: 'Zona da Mata', valor: 'R$ 244k', pct: 48, me: false },
-    { pos: 7, nome: 'Diego Fernandes', regiao: 'Noroeste', valor: 'R$ 201k', pct: 39, me: false },
-    { pos: 8, nome: 'Juliana Prado', regiao: 'Sul de Minas', valor: 'R$ 176k', pct: 34, me: false },
+    { pos: 1, nome: 'Ana Beatriz', regiao: 'BH Capital', valor: 'R$ 512k', pct: 100, me: false, sfId: '003ak00001hj8OLAAY' },
+    { pos: 2, nome: 'Carlos Eduardo', regiao: 'Triângulo', valor: 'R$ 420k', pct: 82, me: true, sfId: '003ak00001hj8OMAAY' },
+    { pos: 3, nome: 'Rafael Souza', regiao: 'Sul de Minas', valor: 'R$ 388k', pct: 76, me: false, sfId: '003ak00001hj8ONAAY' },
+    { pos: 4, nome: 'Letícia Alves', regiao: 'Norte', valor: 'R$ 311k', pct: 61, me: false, sfId: '003ak00001hj8OOAAY' },
+    { pos: 5, nome: 'Bruno Lima', regiao: 'Vale do Aço', valor: 'R$ 287k', pct: 56, me: false, sfId: '003ak00001hj8OPAAY' },
+    { pos: 6, nome: 'Marina Costa', regiao: 'Zona da Mata', valor: 'R$ 244k', pct: 48, me: false, sfId: '003ak00001hj8OQAAY' },
+    { pos: 7, nome: 'Diego Fernandes', regiao: 'Noroeste', valor: 'R$ 201k', pct: 39, me: false, sfId: '003ak00001hj8ORAAY' },
+    { pos: 8, nome: 'Juliana Prado', regiao: 'Sul de Minas', valor: 'R$ 176k', pct: 34, me: false, sfId: '003ak00001hj8OSAAY' },
 ];
 
 const RECOS = [
@@ -108,6 +109,7 @@ export default class StartCrmApp extends LightningElement {
     get isEquipe() { return this.dpage === 'equipe'; }
     get isMapa() { return this.dpage === 'mapa'; }
     get isRanking() { return this.dpage === 'ranking'; }
+    get isRcaDetail() { return this.dpage === 'rcaDetail'; }
 
     get navItemsView() {
         return NAV_ITEMS.map((n) => ({
@@ -193,6 +195,37 @@ export default class StartCrmApp extends LightningElement {
             key: r.pos,
             rowClass: 'rank-item' + (r.pos === 1 ? ' p1' : r.me ? ' p2' : ''),
             barStyle: `width:${r.pct}%`,
+        }));
+    }
+    handleOpenRca(event) {
+        this.selectedContactId = event.currentTarget.dataset.contactId;
+        this.dpage = 'rcaDetail';
+    }
+
+    // ---------- rca detail (real Salesforce data) ----------
+    @track selectedContactId = null;
+    @track rcaDetail = null;
+    @track rcaDetailError = null;
+
+    @wire(getRcaDetail, { contactId: '$selectedContactId' })
+    wiredRcaDetail({ data, error }) {
+        if (data) {
+            this.rcaDetail = data;
+            this.rcaDetailError = null;
+        } else if (error) {
+            this.rcaDetailError = error;
+            this.rcaDetail = null;
+        }
+    }
+    get hasRcaDetail() { return !!this.rcaDetail; }
+    get rcaOpportunitiesView() {
+        if (!this.rcaDetail || !this.rcaDetail.opportunities) return [];
+        return this.rcaDetail.opportunities.map((o, i) => ({
+            key: i,
+            name: o.name,
+            stage: o.stage,
+            amountFmt: o.amount ? this.formatCurrency(o.amount) : '—',
+            closeDate: o.closeDate,
         }));
     }
 

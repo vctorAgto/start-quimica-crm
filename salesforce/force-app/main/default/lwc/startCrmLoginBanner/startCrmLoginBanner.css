@@ -1,0 +1,45 @@
+:host {
+    display: block;
+    height: 100%;
+    min-height: 520px;
+}
+.banner {
+    height: 100%;
+    min-height: 520px;
+    background: radial-gradient(1200px 500px at 10% -10%, #14304f 0%, #0e2136 45%, #081420 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px 36px;
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    box-sizing: border-box;
+}
+.top .logo {
+    height: 32px;
+}
+.middle .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    color: #8fd9e0;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+.middle h1 {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 0 0 12px;
+}
+.middle .sub {
+    color: #b9c6d8;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 360px;
+    margin: 0;
+}
+.footer {
+    color: #7488a3;
+    font-size: 12px;
+}

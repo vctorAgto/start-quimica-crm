@@ -43,7 +43,7 @@
                         <div class="card">
                             <h3>Ranking de RCAs</h3><div class="subtitle">Top desempenho no período</div>
                             <template for:each={rankingTop5View} for:item="r">
-                                <div key={r.key} class={r.rowClass}>
+                                <div key={r.key} class={r.rowClass} data-contact-id={r.sfId} onclick={handleOpenRca}>
                                     <div class="pos">{r.pos}</div>
                                     <div class="who"><b>{r.nome}</b><span>{r.regiao}</span></div>
                                     <div class="bar-wrap"><div class="bar" style={r.barStyle}></div></div>
@@ -247,7 +247,7 @@
                 <div class="content-body">
                     <div class="card">
                         <template for:each={rankingFullView} for:item="r">
-                            <div key={r.key} class={r.rowClass}>
+                            <div key={r.key} class={r.rowClass} data-contact-id={r.sfId} onclick={handleOpenRca}>
                                 <div class="pos">{r.pos}</div>
                                 <div class="who"><b>{r.nome}</b><span>{r.regiao}</span></div>
                                 <div class="bar-wrap"><div class="bar" style={r.barStyle}></div></div>
@@ -255,6 +255,48 @@
                             </div>
                         </template>
                     </div>
+                </div>
+            </template>
+
+            <!-- ============ RCA DETAIL (real Salesforce data) ============ -->
+            <template if:true={isRcaDetail}>
+                <div class="content-header">
+                    <div><h1>Perfil do RCA</h1><div class="meta">Dados reais do Salesforce · Contact + Opportunity</div></div>
+                    <button class="btn ghost" data-page="ranking" onclick={handleNav}>← Voltar ao ranking</button>
+                </div>
+                <div class="content-body">
+                    <template if:true={hasRcaDetail}>
+                        <div class="card mb14">
+                            <h3>{rcaDetail.name}</h3>
+                            <div class="subtitle">Registro real de Contact nesta org</div>
+                            <div class="grid3-box">
+                                <div class="b"><div class="l">CPF</div><div class="v">{rcaDetail.cpf}</div></div>
+                                <div class="b"><div class="l">E-mail</div><div class="v">{rcaDetail.email}</div></div>
+                                <div class="b"><div class="l">Telefone</div><div class="v">{rcaDetail.phone}</div></div>
+                            </div>
+                            <div class="mt12"><span class="muted small">Endereço</span><div>{rcaDetail.address}</div></div>
+                        </div>
+                        <div class="card">
+                            <h3>Oportunidades</h3>
+                            <div class="subtitle">Registros reais vinculados a este RCA</div>
+                            <table>
+                                <thead><tr><th>Oportunidade</th><th>Estágio</th><th>Valor</th><th>Fechamento previsto</th></tr></thead>
+                                <tbody>
+                                    <template for:each={rcaOpportunitiesView} for:item="o">
+                                        <tr key={o.key}>
+                                            <td><b>{o.name}</b></td>
+                                            <td class="muted">{o.stage}</td>
+                                            <td>{o.amountFmt}</td>
+                                            <td class="muted">{o.closeDate}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                    <template if:false={hasRcaDetail}>
+                        <div class="card"><p class="muted small">Carregando dados do Salesforce...</p></div>
+                    </template>
                 </div>
             </template>
         </div>
