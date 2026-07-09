@@ -1,5 +1,6 @@
 import { LightningElement, track, wire } from 'lwc';
 import getAccounts from '@salesforce/apex/StartCrmController.getAccounts';
+import STARTLOGO from '@salesforce/resourceUrl/startLogo';
 
 const STATUS_META = {
     ativo: { cor: '#1f9d55', label: 'Ativos' },
@@ -56,6 +57,8 @@ const PROSPECCOES = [
 ];
 
 export default class StartCrmApp extends LightningElement {
+    logoUrl = STARTLOGO;
+
     @track dpage = 'dashboard';
     @track dperiod = 'Mês';
     @track cockpitTab = 'cartoes';

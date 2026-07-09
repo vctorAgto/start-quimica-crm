@@ -1,11 +1,12 @@
 <template>
     <div class="topstrip">
-        <span class="brand">🧪 Start CRM <span class="brand-ia">+ AzulIA</span></span>
+        <img src={logoUrl} alt="Start" class="topstrip-logo" />
+        <span class="brand">CRM <span class="brand-ia">+ AzulIA</span></span>
     </div>
 
     <div class="app-shell">
         <aside class="sidebar">
-            <div class="brand-box"><span class="logo">S</span> Start CRM</div>
+            <div class="brand-box"><img src={logoUrl} alt="Start" class="sidebar-logo" /> Start CRM</div>
             <nav>
                 <template for:each={navItemsView} for:item="n">
                     <a key={n.id} class={n.cssClass} data-page={n.id} onclick={handleNav}>
