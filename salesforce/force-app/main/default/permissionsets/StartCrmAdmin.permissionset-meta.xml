@@ -5,7 +5,7 @@
     <fieldPermissions>
         <field>Contact.CPF__c</field>
         <readable>true</readable>
-        <editable>true</editable>
+        <editable>false</editable>
     </fieldPermissions>
     <fieldPermissions>
         <field>Opportunity.RCA__c</field>
@@ -13,21 +13,30 @@
         <editable>true</editable>
     </fieldPermissions>
     <objectPermissions>
-        <object>Contact</object>
-        <allowCreate>true</allowCreate>
-        <allowDelete>true</allowDelete>
+        <object>Account</object>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
-        <viewAllRecords>true</viewAllRecords>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <object>Contact</object>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
     <objectPermissions>
         <object>Opportunity</object>
         <allowCreate>true</allowCreate>
-        <allowDelete>true</allowDelete>
+        <allowDelete>false</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
-        <viewAllRecords>true</viewAllRecords>
+        <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
 </PermissionSet>
