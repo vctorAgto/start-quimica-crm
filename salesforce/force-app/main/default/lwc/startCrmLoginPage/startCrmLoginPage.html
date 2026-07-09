@@ -1,0 +1,94 @@
+<template>
+    <div class="sq-login">
+        <div class="sq-login__card">
+            <div class="sq-login__left">
+                <div class="sq-login__left-top">
+                    <img src={logoUrl} alt="Start" class="sq-login__logo-img" />
+                    <div class="sq-login__tagline">Start CRM · AzulIA</div>
+                </div>
+                <div class="sq-login__left-mid">
+                    <div class="sq-login__headline">
+                        Inteligência comercial <span class="sq-login__headline-accent">pra quem está no campo.</span>
+                    </div>
+                    <div class="sq-login__sub">Dados de vendas, churn e oportunidades da Start Química, em um único lugar.</div>
+                </div>
+                <div class="sq-login__left-foot">© {anoAtual} Start Química — Ambiente de demonstração</div>
+            </div>
+
+            <div class="sq-login__right">
+                <template lwc:if={telaEsqueciSenha}>
+                    <div class="sq-login__form-wrap">
+                        <div class="sq-login__form-title">Redefinir senha</div>
+                        <div class="sq-login__form-sub">Informe seu e-mail de acesso e enviaremos as instruções.</div>
+
+                        <template lwc:if={resetEnviado}>
+                            <div class="sq-login__success">
+                                <div class="sq-login__success-icon">✅</div>
+                                <div class="sq-login__success-title">E-mail enviado!</div>
+                                <div class="sq-login__success-sub">Verifique sua caixa de entrada e siga as instruções.</div>
+                            </div>
+                        </template>
+                        <template lwc:else>
+                            <div class="sq-login__field">
+                                <label class="sq-login__label">E-mail / Usuário</label>
+                                <input type="text" class={emailClass} placeholder="seu@email.com"
+                                    data-field="emailReset" oninput={handleInput} autocomplete="username" />
+                                <template lwc:if={erros.emailReset}>
+                                    <span class="sq-login__error">{erros.emailReset}</span>
+                                </template>
+                            </div>
+                            <template lwc:if={erros.geral}>
+                                <div class="sq-login__error-geral">{erros.geral}</div>
+                            </template>
+                            <button class="sq-login__btn" onclick={handleEnviarReset} disabled={loading}>
+                                <template lwc:if={loading}><span class="sq-login__spinner"></span> Enviando...</template>
+                                <template lwc:else>Enviar instruções →</template>
+                            </button>
+                        </template>
+
+                        <button class="sq-login__link" onclick={handleVoltarLogin}>← Voltar ao login</button>
+                    </div>
+                </template>
+
+                <template lwc:else>
+                    <div class="sq-login__form-wrap">
+                        <div class="sq-login__form-title">Bem-vindo de volta</div>
+                        <div class="sq-login__form-sub">Acesse sua conta para continuar</div>
+
+                        <div class="sq-login__field">
+                            <label class="sq-login__label">Usuário</label>
+                            <input type="text" class={usernameClass} placeholder="usuario@email.com"
+                                data-field="username" oninput={handleInput} onkeydown={handleKeyDown}
+                                autocomplete="username" />
+                            <template lwc:if={erros.username}>
+                                <span class="sq-login__error">{erros.username}</span>
+                            </template>
+                        </div>
+
+                        <div class="sq-login__field">
+                            <div class="sq-login__label-row">
+                                <label class="sq-login__label">Senha</label>
+                                <button class="sq-login__link sq-login__link--small" onclick={handleEsqueciSenha}>Esqueci minha senha</button>
+                            </div>
+                            <input type="password" class={passwordClass} placeholder="••••••••"
+                                data-field="password" oninput={handleInput} onkeydown={handleKeyDown}
+                                autocomplete="current-password" />
+                            <template lwc:if={erros.password}>
+                                <span class="sq-login__error">{erros.password}</span>
+                            </template>
+                        </div>
+
+                        <template lwc:if={erros.geral}>
+                            <div class="sq-login__error-geral">{erros.geral}</div>
+                        </template>
+
+                        <button class="sq-login__btn" onclick={handleLogin} disabled={loading}>
+                            <template lwc:if={loading}><span class="sq-login__spinner"></span> Entrando...</template>
+                            <template lwc:else>Entrar →</template>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>
