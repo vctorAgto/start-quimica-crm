@@ -1,0 +1,13 @@
+{
+  "name": "start-quimica-rca-app",
+  "version": "1.0.0",
+  "description": "App do RCA (mock) - versao mobile para representantes em campo",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

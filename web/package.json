@@ -1,0 +1,13 @@
+{
+  "name": "start-quimica-crm-web",
+  "version": "1.0.0",
+  "description": "Start CRM (mock) - versao web/desktop para gestores e diretores",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start CRM · Start Química (mock)</title>
+<style>
+  :root{
+    --navy:#0e2136; --navy2:#15304d; --navy3:#1c3a5c;
+    --blue:#2f6fed; --blue-dark:#1e4fc4; --blue-light:#eaf1ff;
+    --cyan:#12b6c4; --cyan-dark:#0c8f9a; --cyan-light:#e3f9fb;
+    --green:#1f9d55; --green-light:#e8f8ee;
+    --red:#dd3b3b; --red-light:#fdeaea;
+    --amber:#d9891f; --amber-light:#fdf1e0;
+    --gold:#c79a1e;
+    --gray-50:#f5f7fa; --gray-100:#eef1f5; --gray-200:#e2e7ee;
+    --gray-300:#cdd5e0; --gray-400:#9aa5b6; --gray-600:#5b6576; --gray-900:#1b2436;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(15,32,55,.04), 0 8px 24px rgba(15,32,55,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:var(--gray-100); color:var(--gray-900);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:8px;}
+
+  .brand-ia{color:var(--cyan);}
+  .muted{color:var(--gray-600);}
+  .up{color:var(--green);} .down{color:var(--red);} .flat{color:var(--gray-400);}
+
+  /* ---------- top strip ---------- */
+  .topstrip{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 20px; background:#fff; border-bottom:1px solid var(--gray-200);
+    font-size:13px; position:sticky; top:0; z-index:50;
+  }
+  .topstrip .brand{font-weight:800; display:flex; align-items:center; gap:8px;}
+  .topstrip .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px; border:1px solid var(--gray-300);
+    background:#fff; color:var(--gray-600); font-size:13px; font-weight:600;
+  }
+  .topstrip .pill:hover{border-color:var(--blue); color:var(--blue);}
+
+  /* ---------- DESKTOP SHELL ---------- */
+  .app-shell{display:flex; min-height:calc(100vh - 49px);}
+  .sidebar{
+    width:230px; background:var(--navy); color:#dbe6f2; flex-shrink:0;
+    display:flex; flex-direction:column; padding:18px 14px;
+  }
+  .sidebar .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 20px; font-weight:800; font-size:15px; color:#fff;}
+  .sidebar .brand .logo{
+    width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--cyan));
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;
+  }
+  .sidebar nav{display:flex; flex-direction:column; gap:2px; flex:1;}
+  .sidebar nav a{
+    display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px;
+    color:#b7c6da; font-size:14px; font-weight:600;
+  }
+  .sidebar nav a .ic{width:18px; text-align:center; opacity:.9;}
+  .sidebar nav a:hover{background:rgba(255,255,255,.06); color:#fff;}
+  .sidebar nav a.active{background:var(--blue); color:#fff;}
+  .sidebar .azulia-teaser{
+    margin-top:12px; background:linear-gradient(135deg,#0f4c56,#0c2f42); border:1px solid #1c5560;
+    border-radius:12px; padding:14px; font-size:12.5px; color:#cdeef1; line-height:1.5; cursor:pointer;
+  }
+  .sidebar .azulia-teaser b{color:#fff; display:block; margin-bottom:4px; font-size:13px;}
+
+  .main{flex:1; min-width:0; display:flex; flex-direction:column;}
+  .content-header{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    padding:20px 26px 6px;
+  }
+  .content-header h1{font-size:21px; margin:0 0 2px;}
+  .content-header .meta{color:var(--gray-600); font-size:13px;}
+  .seg-toggle{display:flex; background:var(--gray-100); border-radius:10px; padding:3px; gap:2px;}
+  .seg-toggle button{border:0; background:transparent; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:600; color:var(--gray-600);}
+  .seg-toggle button.active{background:#fff; color:var(--navy); box-shadow:var(--shadow);}
+  .content-body{padding:16px 26px 40px; flex:1;}
+
+  /* ---------- cards / kpis ---------- */
+  .card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px;}
+  .grid{display:grid; gap:14px;}
+  .kpis{grid-template-columns:repeat(5,1fr); margin-bottom:14px;}
+  .kpi .label{font-size:11px; letter-spacing:.5px; text-transform:uppercase; color:var(--gray-600); font-weight:700; margin-bottom:8px;}
+  .kpi .value{font-size:22px; font-weight:800; margin-bottom:4px;}
+  .kpi .delta{font-size:12px; font-weight:700;}
+  .row2{display:grid; grid-template-columns:1.3fr 1fr; gap:14px; margin-bottom:14px;}
+  .row3{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .card h3{margin:0 0 2px; font-size:15px;}
+  .card .subtitle{color:var(--gray-600); font-size:12px; margin-bottom:14px;}
+
+  .rank-item{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--gray-100);}
+  .rank-item:last-child{border-bottom:0;}
+  .rank-item .pos{
+    width:24px;height:24px;border-radius:7px;background:var(--gray-100);color:var(--gray-600);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800; flex-shrink:0;
+  }
+  .rank-item.p1 .pos{background:var(--gold); color:#fff;}
+  .rank-item.p2 .pos{background:var(--blue); color:#fff;}
+  .rank-item .who{flex:1; min-width:0;}
+  .rank-item .who b{font-size:13.5px; display:block;}
+  .rank-item .who span{font-size:11.5px; color:var(--gray-600);}
+  .rank-item .bar-wrap{width:110px; height:6px; background:var(--gray-100); border-radius:6px; overflow:hidden; margin:0 10px;}
+  .rank-item .bar{height:100%; background:var(--blue); border-radius:6px;}
+  .rank-item.p1 .bar{background:var(--gold);}
+  .rank-item .val{font-size:13px; font-weight:700; width:64px; text-align:right;}
+
+  .minimap{position:relative; height:180px; background:var(--gray-50); border-radius:10px; border:1px solid var(--gray-200); overflow:hidden;}
+  .minimap .dot{position:absolute; width:12px; height:12px; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .legend{display:flex; gap:14px; font-size:11.5px; color:var(--gray-600); margin-top:10px; flex-wrap:wrap;}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:50%; display:inline-block;}
+
+  .stat-box{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px;}
+  .stat-box .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-600); font-weight:700; margin-bottom:6px;}
+  .stat-box .num{font-size:20px; font-weight:800;}
+  .stat-box .sub{font-size:11.5px; color:var(--gray-600);}
+  .stat-box.cta{background:var(--navy); color:#fff; cursor:pointer;}
+  .stat-box.cta .lbl{color:#9fd8de;}
+  .stat-box.cta .num{color:#fff;}
+
+  /* ---------- cockpit ---------- */
+  .cockpit-top{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px;}
+  .cockpit-top .card .num{font-size:24px; font-weight:800;}
+  .cockpit-top .card.highlight{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .cockpit-top .card.highlight .label{color:#9fd8de;}
+  .reco-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  .reco-card{background:#fff; border:1px solid var(--gray-200); border-left:4px solid var(--blue); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px 18px;}
+  .reco-card.churn{border-left-color:var(--red);}
+  .reco-card.cross{border-left-color:var(--cyan);}
+  .reco-card.lead{border-left-color:var(--green);}
+  .reco-card.react{border-left-color:var(--amber);}
+  .reco-card .tag{font-size:10.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:var(--gray-600); margin-bottom:6px;}
+  .reco-card.churn .tag{color:var(--red);} .reco-card.cross .tag{color:var(--cyan-dark);}
+  .reco-card.lead .tag{color:var(--green);} .reco-card.react .tag{color:var(--amber);}
+  .reco-card h4{margin:0 0 6px; font-size:15px;}
+  .reco-card p{margin:0 0 14px; font-size:13px; color:var(--gray-600); line-height:1.5;}
+  .reco-card .foot{display:flex; align-items:center; justify-content:space-between;}
+  .reco-card .impact{font-size:13px; font-weight:800; color:var(--green);}
+  .reco-card.churn .impact{color:var(--red);}
+
+  .queue-row{display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--gray-200); border-left:4px solid var(--blue);
+    border-radius:10px; padding:12px 16px; margin-bottom:10px;}
+  .queue-row .body{flex:1; min-width:0;}
+  .queue-row .tag{font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--gray-600);}
+  .queue-row h4{margin:2px 0 2px; font-size:14.5px;}
+  .queue-row p{margin:0; font-size:12.5px; color:var(--gray-600);}
+  .queue-row .impact{font-weight:800; font-size:13px; white-space:nowrap;}
+
+  /* ---------- buttons / badges / chips ---------- */
+  .btn{border:0; border-radius:9px; padding:9px 16px; font-size:13px; font-weight:700; background:var(--blue); color:#fff;}
+  .btn:hover{background:var(--blue-dark);}
+  .btn.sm{padding:7px 12px; font-size:12.5px;}
+  .btn.ghost{background:#fff; color:var(--gray-900); border:1px solid var(--gray-300);}
+  .btn.block{width:100%;}
+  .badge{display:inline-block; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:800;}
+  .chip{display:inline-flex; align-items:center; padding:6px 13px; border-radius:999px; border:1px solid var(--gray-300); font-size:12.5px; font-weight:600; color:var(--gray-600); background:#fff;}
+  .chip.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-600); padding:8px 10px; border-bottom:2px solid var(--gray-100);}
+  td{padding:11px 10px; border-bottom:1px solid var(--gray-100);}
+  tr:last-child td{border-bottom:0;}
+
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff;
+    padding:12px 20px; border-radius:10px; font-size:13.5px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:999; display:flex; align-items:center; gap:8px;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  @media (max-width:900px){
+    .kpis, .row3, .row2, .cockpit-top, .reco-grid{grid-template-columns:1fr 1fr;}
+    .sidebar{width:190px;}
+  }
+
+  /* ---------- click affordance ---------- */
+  [data-go], [data-action]{cursor:pointer;}
+  .btn,.chip,.pill,.seg-toggle button{transition:transform .08s ease;}
+  .btn:active,.chip:active,.pill:active,.seg-toggle button:active{transform:scale(.94);}
+  .card[data-go],.rank-item,.stat-box.cta{transition:transform .1s ease, box-shadow .15s ease;}
+  .card[data-go]:hover{box-shadow:0 10px 26px rgba(15,32,55,.12); transform:translateY(-1px);}
+  .card[data-go]:active,.rank-item:active,.stat-box.cta:active{transform:scale(.98);}
+  .is-done{opacity:.55;}
+  .done-badge{background:var(--green-light); color:var(--green); font-weight:800; font-size:11.5px; padding:6px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;}
+
+  /* ---------- login ---------- */
+  .login-page{min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(1200px 500px at 10% -10%, #14304f 0%, var(--navy) 45%, #081420 100%); padding:20px;}
+  .login-card{width:360px; max-width:100%; background:#fff; border-radius:18px; padding:34px 30px; box-shadow:0 20px 60px rgba(0,0,0,.35);}
+  .login-logo{font-size:15px; font-weight:800; margin-bottom:18px;}
+  .login-card h2{margin:0 0 4px; font-size:20px;}
+  .login-err{background:var(--red-light); color:var(--red); font-size:12.5px; font-weight:700; padding:9px 12px; border-radius:9px; margin-bottom:12px;}
+  .login-hint{text-align:center; font-size:12px; color:var(--gray-600); margin:16px 0 0;}
+  @keyframes shake{10%,90%{transform:translateX(-1px);}20%,80%{transform:translateX(2px);}30%,50%,70%{transform:translateX(-4px);}40%,60%{transform:translateX(4px);}}
+  .shake{animation:shake .4s;}
+
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-600); font-weight:700; margin-bottom:5px;}
+  .field input{width:100%; border:1px solid var(--gray-300); border-radius:9px; padding:10px 12px; font-size:13.5px; background:#fff;}
+
+  /* ---------- activity feed ---------- */
+  .activity-feed{margin-top:18px; background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow);}
+  .activity-feed h4{margin:0 0 8px; font-size:13px;}
+  .activity-item{display:flex; gap:8px; font-size:12.5px; color:var(--gray-600); padding:6px 0; border-bottom:1px solid var(--gray-100);}
+  .activity-item:last-child{border-bottom:0;}
+  .activity-item .dot{width:6px;height:6px;border-radius:50%; background:var(--cyan); margin-top:5px; flex-shrink:0;}
+</style>
+
+<div id="toast" class="toast"></div>
+<div id="root"></div>
+
+<script>
+/* ============================= DATA ============================= */
+const RANKING = [
+  {pos:1,nome:'Ana Beatriz',regiao:'BH Capital',valor:'R$ 512k',pct:100},
+  {pos:2,nome:'Carlos Eduardo',regiao:'Triângulo',valor:'R$ 420k',pct:82, me:true},
+  {pos:3,nome:'Rafael Souza',regiao:'Sul de Minas',valor:'R$ 388k',pct:76},
+  {pos:4,nome:'Letícia Alves',regiao:'Norte',valor:'R$ 311k',pct:61},
+  {pos:5,nome:'Bruno Lima',regiao:'Vale do Aço',valor:'R$ 287k',pct:56},
+  {pos:6,nome:'Marina Costa',regiao:'Zona da Mata',valor:'R$ 244k',pct:48},
+  {pos:7,nome:'Diego Fernandes',regiao:'Noroeste',valor:'R$ 201k',pct:39},
+  {pos:8,nome:'Juliana Prado',regiao:'Sul de Minas',valor:'R$ 176k',pct:34},
+];
+
+const RECOS = [
+  {id:'churn1', tipo:'churn', tag:'Prevenção de churn', titulo:'Visitar Hospital São José', desc:'Churn estimado em 78% — 52 dias sem compra e queda de ticket. Janela de ação curta.', impacto:'Reter R$ 96k/ano', cta:'Planejar visita'},
+  {id:'cross1', tipo:'cross', tag:'Cross-sell · mix ideal', titulo:'Oferecer Asseptgel Pro à Santa Clara', desc:'87% dos clientes de perfil semelhante já compram este item. Conta saudável e receptiva.', impacto:'+R$ 42k/ano', cta:'Adicionar à proposta'},
+  {id:'lead1', tipo:'lead', tag:'Geração de lead', titulo:'Prospectar Supermercado ABC', desc:'Mapeamento aponta alta propensão na região de Araguari. Sem fornecedor ativo da categoria.', impacto:'Potencial R$ 180k/ano', cta:'Criar lead'},
+  {id:'react1', tipo:'react', tag:'Reativação', titulo:'Reativar Restaurante Sabor Mineiro', desc:'Inativo há 6 meses, alta rentabilidade histórica. Motivo: troca de comprador.', impacto:'Recuperar R$ 64k/ano', cta:'Planejar visita'},
+];
+
+const STATUS_META = {
+  ativo:{cor:'#1f9d55', label:'Ativos'},
+  atencao:{cor:'#d9891f', label:'Atenção'},
+  risco:{cor:'#dd3b3b', label:'Em risco'},
+  prospeccao:{cor:'#2f6fed', label:'Prospecção'},
+};
+const MAPA_PONTOS = [
+  {x:22,y:38,status:'ativo',nome:'Hospital Santa Clara',cidade:'Uberlândia/MG',fat:'R$ 312k'},
+  {x:70,y:20,status:'atencao',nome:'Distribuidora Bella',cidade:'Uberlândia/MG',fat:'R$ 96k'},
+  {x:63,y:52,status:'prospeccao',nome:'Supermercado ABC',cidade:'Araguari/MG',fat:'potencial R$ 180k/ano'},
+  {x:38,y:68,status:'risco',nome:'Hospital XPTO',cidade:'Araguari/MG',fat:'R$ 88k'},
+  {x:80,y:58,status:'ativo',nome:'Frigorífico Vale Verde',cidade:'Patos de Minas/MG',fat:'R$ 203k'},
+  {x:47,y:30,status:'prospeccao',nome:'Mercado Bom Preço',cidade:'Uberaba/MG',fat:'potencial R$ 140k/ano'},
+  {x:15,y:60,status:'atencao',nome:'Laticínios Serra Azul',cidade:'Patrocínio/MG',fat:'R$ 61k'},
+  {x:58,y:75,status:'ativo',nome:'Mercado União',cidade:'Uberaba/MG',fat:'R$ 246k'},
+  {x:33,y:22,status:'ativo',nome:'Agro Cerrado Insumos',cidade:'Uberlândia/MG',fat:'R$ 178k'},
+  {x:55,y:44,status:'risco',nome:'Pet Center Patas & Cia',cidade:'Uberlândia/MG',fat:'R$ 54k'},
+  {x:88,y:35,status:'atencao',nome:'Clínica Vida Plena',cidade:'Ituiutaba/MG',fat:'R$ 35k'},
+  {x:12,y:80,status:'prospeccao',nome:'Rede Center Farma',cidade:'Uberlândia/MG',fat:'potencial R$ 95k/ano'},
+];
+const PROSPECCOES = [
+  {nome:'Supermercado ABC', cidade:'Araguari/MG', motivo:'Sem fornecedor ativo da categoria', valor:'R$ 180k/ano'},
+  {nome:'Mercado Bom Preço', cidade:'Uberaba/MG', motivo:'Mesmo porte de contas Azulim ativas na região', valor:'R$ 140k/ano'},
+  {nome:'Rede Center Farma', cidade:'Uberlândia/MG', motivo:'Alta propensão por perfil de compra similar', valor:'R$ 95k/ano'},
+];
+
+/* ============================= AUTH & APP STATE ============================= */
+function loadJSON(key, fallback){
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
+}
+function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+const AUTH = loadJSON('sq_crm_auth', {loggedIn:false, user:null});
+const APP = loadJSON('sq_crm_state', {doneRecos:[], activities:[]});
+function saveApp(){ saveJSON('sq_crm_state', APP); }
+function nowHM(){ return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function logActivity(msg){
+  APP.activities.unshift({msg, time:nowHM()});
+  APP.activities = APP.activities.slice(0,8);
+  saveApp();
+}
+
+/* ============================= STATE ============================= */
+const S = { dpage:'dashboard', dperiod:'Mês', cockpitTab:'cartoes', mapaSel:null };
+function go(patch){ Object.assign(S, patch); render(); window.scrollTo(0,0); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.innerHTML = '✓ '+msg; t.classList.add('show');
+  clearTimeout(window.__toastT); window.__toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  if(u.toLowerCase()==='admin' && p==='admin'){
+    AUTH.loggedIn = true; AUTH.user = 'admin'; saveJSON('sq_crm_auth', AUTH);
+    render();
+  } else {
+    const card = document.getElementById('loginCard');
+    document.getElementById('loginError').style.display = 'block';
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+  }
+}
+function doLogout(){
+  AUTH.loggedIn = false; AUTH.user = null; saveJSON('sq_crm_auth', AUTH);
+  render();
+}
+function markRecoDone(el){
+  const id = el.getAttribute('data-id'); const label = el.getAttribute('data-label');
+  const reco = RECOS.find(r=>r.id===id);
+  if(!APP.doneRecos.includes(id)){ APP.doneRecos.push(id); saveApp(); logActivity(`${label}: "${reco.titulo}"`); }
+  toast(`${label} registrado — ação concluída`);
+  render();
+}
+
+/* ============================= RENDER ROOT ============================= */
+function render(){
+  const root = document.getElementById('root');
+  if(!AUTH.loggedIn){ root.innerHTML = renderLogin(); return; }
+  root.innerHTML = topStrip() + renderDesktop();
+}
+
+function renderLogin(){
+  return `<div class="login-page">
+    <div class="login-card" id="loginCard">
+      <div class="login-logo">🧪 Start <span class="brand-ia">CRM</span></div>
+      <h2>Entrar no Start CRM</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 20px;">Ambiente de demonstração · Onze</p>
+      <div class="field"><label>Usuário</label><input id="loginUser" value="admin" autocomplete="username"></div>
+      <div class="field"><label>Senha</label><input id="loginPass" type="password" value="admin" autocomplete="current-password"></div>
+      <div id="loginError" class="login-err" style="display:none;">Usuário ou senha inválidos.</div>
+      <button class="btn block" data-action="login">Entrar →</button>
+      <p class="login-hint">Use <b>admin</b> / <b>admin</b> para acessar a demonstração.</p>
+    </div>
+  </div>`;
+}
+
+function topStrip(){
+  return `<div class="topstrip">
+    <span class="brand">🧪 Start CRM <span class="brand-ia">+ AzulIA</span></span>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="muted" style="font-size:12.5px;">Olá, <b style="color:var(--gray-900)">${AUTH.user||'admin'}</b></span>
+      <button class="pill" data-action="logout">Sair</button>
+    </div>
+  </div>`;
+}
+
+/* ============================= DESKTOP ============================= */
+const NAV_ITEMS = [
+  {id:'dashboard', label:'Dashboard', ic:'▦'},
+  {id:'cockpit', label:'Cockpit de IA', ic:'✦'},
+  {id:'equipe', label:'Equipe & carteira', ic:'◧'},
+  {id:'mapa', label:'Mapa de mercado', ic:'◎'},
+  {id:'ranking', label:'Ranking', ic:'▲'},
+];
+
+function renderDesktop(){
+  return `<div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="logo">S</span> Start CRM</div>
+      <nav>
+        ${NAV_ITEMS.map(n=>`<a class="${S.dpage===n.id?'active':''}" data-go='{"dpage":"${n.id}"}'><span class="ic">${n.ic}</span>${n.label}</a>`).join('')}
+      </nav>
+      <div class="azulia-teaser" data-go='{"dpage":"cockpit"}'>
+        <b>✦ Azul<span class="brand-ia">IA</span></b>
+        4 ações de alto impacto sugeridas para a equipe hoje.
+      </div>
+    </aside>
+    <div class="main">
+      ${desktopPage()}
+    </div>
+  </div>`;
+}
+
+function desktopPage(){
+  if(S.dpage==='dashboard') return dashboardPage();
+  if(S.dpage==='cockpit') return cockpitPage();
+  if(S.dpage==='equipe') return equipePage();
+  if(S.dpage==='mapa') return mapaPage();
+  if(S.dpage==='ranking') return rankingPage();
+  return '';
+}
+
+function periodToggle(){
+  return `<div class="seg-toggle">
+    ${['Mês','Trimestre','Ano'].map(p=>`<button class="${S.dperiod===p?'active':''}" data-go='{"dperiod":"${p}"}'>${p}</button>`).join('')}
+  </div>`;
+}
+
+function dashboardPage(){
+  return `
+  <div class="content-header">
+    <div><h1>Dashboard comercial</h1><div class="meta">Junho 2026 · Região Triângulo Mineiro · 18 RCAs</div></div>
+    ${periodToggle()}
+  </div>
+  <div class="content-body">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="label">Meta do mês</div><div class="value">72%</div><div class="muted" style="font-size:12px;margin-bottom:4px;">R$ 2,16M de R$ 3,0M</div><div class="delta up">▲ +6 p.p. vs maio</div></div>
+      <div class="card kpi"><div class="label">Pipeline</div><div class="value">R$ 1,24M</div><div class="muted" style="font-size:12px;margin-bottom:4px;">38 oportunidades</div><div class="delta up">▲ +12%</div></div>
+      <div class="card kpi"><div class="label">Visitas</div><div class="value">248 / 310</div><div class="muted" style="font-size:12px;margin-bottom:4px;">80% do planejado</div><div class="delta flat">▬ no ritmo</div></div>
+      <div class="card kpi"><div class="label">Cobertura</div><div class="value">79%</div><div class="muted" style="font-size:12px;margin-bottom:4px;">carteira visitada/mês</div><div class="delta up">▲ +4 p.p.</div></div>
+      <div class="card kpi"><div class="label">Churn</div><div class="value" style="color:var(--red)">4,2%</div><div class="muted" style="font-size:12px;margin-bottom:4px;">18 contas em risco</div><div class="delta up">▼ -0,6 p.p.</div></div>
+    </div>
+    <div class="row2">
+      <div class="card">
+        <h3>Ranking de RCAs</h3><div class="subtitle">Top desempenho no período</div>
+        ${RANKING.slice(0,5).map(r=>`<div class="rank-item ${r.pos===1?'p1':r.me?'p2':''}">
+          <div class="pos">${r.pos}</div>
+          <div class="who"><b>${r.nome}</b><span>${r.regiao}</span></div>
+          <div class="bar-wrap"><div class="bar" style="width:${r.pct}%"></div></div>
+          <div class="val">${r.valor}</div>
+        </div>`).join('')}
+        <div style="margin-top:12px;"><a class="chip" data-go='{"dpage":"ranking"}'>Ver ranking completo →</a></div>
+      </div>
+      <div class="card" data-go='{"dpage":"mapa"}'>
+        <h3>Mapa de mercado</h3><div class="subtitle">Triângulo MG</div>
+        ${miniMap(MAPA_PONTOS)}
+        ${mapLegend()}
+        <div style="margin-top:12px;"><a class="chip" data-go='{"dpage":"mapa"}'>Ver mapa completo →</a></div>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="stat-box"><div class="lbl">Clientes sem visita</div><div class="num">34</div><div class="sub">há +30 dias</div></div>
+      <div class="stat-box"><div class="lbl">Reativações</div><div class="num">9</div><div class="sub">no mês · R$ 188k</div></div>
+      <div class="stat-box"><div class="lbl">Cross-sell</div><div class="num">23</div><div class="sub">conversões via AzulIA</div></div>
+      <div class="stat-box cta" data-go='{"dpage":"cockpit"}'><div class="lbl">✦ Cockpit de IA</div><div class="num">4 ações de alto impacto</div><div class="sub" style="color:#cfeef1;">ver recomendações →</div></div>
+    </div>
+  </div>`;
+}
+
+function miniMap(points){
+  return `<div class="minimap">${points.map(p=>`<div class="dot" style="left:${p.x}%; top:${p.y}%; background:${STATUS_META[p.status].cor};" title="${p.nome}"></div>`).join('')}</div>`;
+}
+function mapLegend(){
+  return `<div class="legend">
+    <span><i style="background:#1f9d55"></i>Ativos</span>
+    <span><i style="background:#d9891f"></i>Atenção</span>
+    <span><i style="background:#dd3b3b"></i>Em risco</span>
+    <span><i style="background:#2f6fed"></i>Prospecção</span>
+  </div>`;
+}
+function mapLegendCounts(counts){
+  return `<div class="legend">
+    <span><i style="background:#1f9d55"></i>Ativos (${counts.ativo})</span>
+    <span><i style="background:#d9891f"></i>Atenção (${counts.atencao})</span>
+    <span><i style="background:#dd3b3b"></i>Em risco (${counts.risco})</span>
+    <span><i style="background:#2f6fed"></i>Prospecção (${counts.prospeccao})</span>
+  </div>`;
+}
+
+function cockpitPage(){
+  const tag2class = {churn:'churn',cross:'cross',lead:'lead',react:'react'};
+  return `
+  <div class="content-header">
+    <div><h1>✦ Cockpit Azul<span class="brand-ia">IA</span></h1><div class="meta">Recomendações priorizadas por impacto · atualizado há 8 min</div></div>
+    <div class="seg-toggle">
+      <button class="${S.cockpitTab==='cartoes'?'active':''}" data-go='{"cockpitTab":"cartoes"}'>Cartões</button>
+      <button class="${S.cockpitTab==='fila'?'active':''}" data-go='{"cockpitTab":"fila"}'>Fila priorizada</button>
+    </div>
+  </div>
+  <div class="content-body">
+    <div class="cockpit-top">
+      <div class="card highlight"><div class="label" style="font-size:11px;text-transform:uppercase;font-weight:700;">Impacto projetado</div><div class="num">R$ 382k/ano</div></div>
+      <div class="card"><div class="label" style="font-size:11px;text-transform:uppercase;font-weight:700;color:var(--gray-600);">Ações sugeridas</div><div class="num">4</div></div>
+      <div class="card"><div class="label" style="font-size:11px;text-transform:uppercase;font-weight:700;color:var(--gray-600);">Churn evitável</div><div class="num" style="color:var(--red)">R$ 96k</div></div>
+      <div class="card"><div class="label" style="font-size:11px;text-transform:uppercase;font-weight:700;color:var(--gray-600);">Confiança média</div><div class="num" style="color:var(--green)">High</div></div>
+    </div>
+    ${S.cockpitTab==='cartoes' ? `
+      <div class="reco-grid">
+        ${RECOS.map(r=>{ const done = APP.doneRecos.includes(r.id); return `<div class="reco-card ${tag2class[r.tipo]} ${done?'is-done':''}">
+          <div class="tag">${r.tag}</div><h4>${r.titulo}</h4><p>${r.desc}</p>
+          <div class="foot"><span class="impact">${r.impacto}</span>${done?`<span class="done-badge">✓ Concluído</span>`:`<button class="btn sm" data-action="mark-reco" data-id="${r.id}" data-label="${r.cta}">${r.cta}</button>`}</div>
+        </div>`;}).join('')}
+      </div>` : `
+      <div>
+        ${RECOS.map(r=>{ const done = APP.doneRecos.includes(r.id); return `<div class="queue-row ${tag2class[r.tipo]} ${done?'is-done':''}" style="border-left-color:${
+          r.tipo==='churn'?'var(--red)':r.tipo==='cross'?'var(--cyan)':r.tipo==='lead'?'var(--green)':'var(--amber)'}">
+          <div class="body"><div class="tag">${r.tag}</div><h4>${r.titulo}</h4><p>${r.desc}</p></div>
+          <div class="impact" style="color:${r.tipo==='churn'?'var(--red)':'var(--green)'}">${r.impacto}</div>
+          ${done?`<span class="done-badge">✓ Concluído</span>`:`<button class="btn sm" data-action="mark-reco" data-id="${r.id}" data-label="${r.cta}">${r.cta}</button>`}
+        </div>`;}).join('')}
+      </div>`}
+    ${APP.activities.length? `<div class="activity-feed"><h4>Últimas ações registradas</h4>${APP.activities.map(a=>`<div class="activity-item"><span class="dot"></span><div>${a.msg} <span class="muted" style="font-size:11px;">${a.time}</span></div></div>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+function equipePage(){
+  return `
+  <div class="content-header"><div><h1>Equipe &amp; carteira</h1><div class="meta">4 Diretores Regionais · 60 Gerentes de Mercado · 750 RCAs</div></div></div>
+  <div class="content-body">
+    <div class="card">
+      <h3>Região Triângulo Mineiro</h3><div class="subtitle">18 RCAs sob gestão de Carlos Eduardo (Gerente de Mercado)</div>
+      <table>
+        <thead><tr><th>RCA</th><th>Carteira</th><th>Clientes ativos</th><th>Cobertura</th><th>Meta do mês</th><th>Churn</th></tr></thead>
+        <tbody>
+          ${RANKING.map(r=>`<tr>
+            <td><b>${r.nome}</b></td><td class="muted">${r.regiao}</td>
+            <td>${60+r.pos*3} / ${90+r.pos*2}</td>
+            <td>${80-r.pos*3}%</td>
+            <td>${r.pct}%</td>
+            <td style="color:${r.pos%3===0?'var(--red)':'var(--green)'}">${r.pos%3===0?'6,'+r.pos+'%':'2,'+r.pos+'%'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function mapaPage(){
+  const counts = {ativo:0, atencao:0, risco:0, prospeccao:0};
+  MAPA_PONTOS.forEach(p=>counts[p.status]++);
+  const sel = S.mapaSel!=null ? MAPA_PONTOS[S.mapaSel] : null;
+  return `
+  <div class="content-header"><div><h1>Mapa de mercado</h1><div class="meta">Triângulo Mineiro · carteira ativa e oportunidades de prospecção</div></div></div>
+  <div class="content-body">
+    <div class="row3" style="margin-bottom:14px;">
+      <div class="stat-box"><div class="lbl" style="color:var(--green)">● Ativos</div><div class="num">${counts.ativo}</div><div class="sub">contas saudáveis</div></div>
+      <div class="stat-box"><div class="lbl" style="color:var(--amber)">● Atenção</div><div class="num">${counts.atencao}</div><div class="sub">acompanhar de perto</div></div>
+      <div class="stat-box"><div class="lbl" style="color:var(--red)">● Em risco</div><div class="num">${counts.risco}</div><div class="sub">churn elevado</div></div>
+      <div class="stat-box"><div class="lbl" style="color:var(--blue)">● Prospecção</div><div class="num">${counts.prospeccao}</div><div class="sub">sem fornecedor ativo</div></div>
+    </div>
+    <div class="row2">
+      <div class="card">
+        <h3>Distribuição geográfica</h3><div class="subtitle">Clique em um ponto para ver detalhes</div>
+        <div class="minimap" style="height:360px;">${MAPA_PONTOS.map((p,i)=>`<div class="dot" data-go='{"mapaSel":${i}}' style="left:${p.x}%; top:${p.y}%; background:${STATUS_META[p.status].cor}; cursor:pointer; ${S.mapaSel===i?'width:18px;height:18px;box-shadow:0 0 0 4px rgba(47,111,237,.25);':''}" title="${p.nome}"></div>`).join('')}</div>
+        ${mapLegendCounts(counts)}
+      </div>
+      <div class="card">
+        <h3>${sel? sel.nome : 'Selecione um ponto no mapa'}</h3>
+        ${sel? `
+          <div class="subtitle">${sel.cidade}</div>
+          <div style="margin:10px 0 4px;">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);"><span class="muted">Status</span><b style="color:${STATUS_META[sel.status].cor}">${STATUS_META[sel.status].label}</b></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;"><span class="muted">${sel.status==='prospeccao'?'Potencial estimado':'Faturamento'}</span><b>${sel.fat}</b></div>
+          </div>
+        `: `<p class="muted" style="font-size:13px;">Veja o status de cada conta e identifique oportunidades de prospecção por região.</p>`}
+        <hr style="border:0;border-top:1px solid var(--gray-100);margin:14px 0;">
+        <h3 style="font-size:14px;">✦ Oportunidades de prospecção</h3>
+        <div class="subtitle">Mapeamento AzulIA · alta propensão de conversão</div>
+        ${PROSPECCOES.map(o=>`<div style="padding:10px 0;border-bottom:1px solid var(--gray-100);">
+          <div style="display:flex;justify-content:space-between;gap:10px;"><b style="font-size:13px;">${o.nome}</b><span style="font-size:12px;font-weight:800;color:var(--green);white-space:nowrap;">${o.valor}</span></div>
+          <div class="muted" style="font-size:12px;">${o.cidade} · ${o.motivo}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function rankingPage(){
+  return `
+  <div class="content-header"><div><h1>Ranking de RCAs</h1><div class="meta">Região Triângulo Mineiro · Junho 2026</div></div>${periodToggle()}</div>
+  <div class="content-body">
+    <div class="card">
+      ${RANKING.map(r=>`<div class="rank-item ${r.pos===1?'p1':r.me?'p2':''}">
+        <div class="pos">${r.pos}</div>
+        <div class="who"><b>${r.nome}</b><span>${r.regiao}</span></div>
+        <div class="bar-wrap"><div class="bar" style="width:${r.pct}%"></div></div>
+        <div class="val">${r.valor}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ============================= EVENTS ============================= */
+document.addEventListener('click', (e)=>{
+  const goEl = e.target.closest('[data-go]');
+  if(goEl){ go(JSON.parse(goEl.getAttribute('data-go'))); return; }
+  const actionEl = e.target.closest('[data-action]');
+  if(actionEl){
+    const action = actionEl.getAttribute('data-action');
+    if(action==='login') return doLogin();
+    if(action==='logout') return doLogout();
+    if(action==='mark-reco') return markRecoDone(actionEl);
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && !AUTH.loggedIn && (e.target.id==='loginUser'||e.target.id==='loginPass')) doLogin();
+});
+
+render();
+</script>
+</html>

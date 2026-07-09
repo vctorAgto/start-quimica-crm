@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e2136">
+<title>App do RCA · Start Química (mock)</title>
+<style>
+  :root{
+    --navy:#0e2136; --navy2:#15304d;
+    --blue:#2f6fed; --blue-dark:#1e4fc4; --blue-light:#eaf1ff;
+    --cyan:#12b6c4; --cyan-dark:#0c8f9a; --cyan-light:#e3f9fb;
+    --green:#1f9d55; --green-light:#e8f8ee;
+    --red:#dd3b3b; --red-light:#fdeaea;
+    --amber:#d9891f; --amber-light:#fdf1e0;
+    --gray-50:#f5f7fa; --gray-100:#eef1f5; --gray-200:#e2e7ee;
+    --gray-300:#cdd5e0; --gray-400:#9aa5b6; --gray-600:#5b6576; --gray-900:#1b2436;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(15,32,55,.04), 0 8px 24px rgba(15,32,55,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0; height:100%;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:var(--gray-100); color:var(--gray-900);
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:8px;}
+  #root{display:flex; flex-direction:column; min-height:100vh; min-height:100dvh;}
+
+  .brand-ia{color:var(--cyan);}
+  .muted{color:var(--gray-600);}
+
+  /* ---------- top strip ---------- */
+  .topstrip{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; background:#fff; border-bottom:1px solid var(--gray-200);
+    font-size:13px; flex-shrink:0;
+  }
+  .topstrip .brand{font-weight:800;}
+  .topstrip .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:999px; border:1px solid var(--gray-300);
+    background:#fff; color:var(--gray-600); font-size:12.5px; font-weight:600;
+  }
+
+  /* ---------- app shell: always fills the viewport, no fake phone bezel ---------- */
+  .phone-page{flex:1; display:flex; justify-content:center; background:var(--gray-100); min-height:0;}
+  .phone-frame{width:100%; max-width:480px; background:var(--gray-100); display:flex; flex-direction:column; min-height:0;}
+  .phone-content{flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:14px 14px 10px;}
+  .phone-tabbar{display:flex; background:#fff; border-top:1px solid var(--gray-200); padding:8px 6px calc(10px + env(safe-area-inset-bottom)); flex-shrink:0;}
+  .phone-tabbar a{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; color:var(--gray-400); font-weight:700;}
+  .phone-tabbar a.active{color:var(--blue);}
+  .phone-tabbar .ic{font-size:17px;}
+
+  .m-card{background:#fff; border:1px solid var(--gray-200); border-radius:14px; padding:14px 15px; margin-bottom:12px; box-shadow:var(--shadow);}
+  .m-hello{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+  .m-hello .av{width:38px;height:38px;border-radius:10px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+  .m-hello h2{margin:0; font-size:16px;}
+  .m-hello span{font-size:12px; color:var(--gray-600);}
+  .m-hello .sparkle{margin-left:auto; width:34px;height:34px;border-radius:10px;background:var(--cyan-light); color:var(--cyan-dark); display:flex;align-items:center;justify-content:center; font-size:15px;}
+  .m-seg{display:flex; background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:3px; margin-bottom:12px;}
+  .m-seg button{flex:1; border:0; background:transparent; padding:8px; border-radius:8px; font-size:12.5px; font-weight:700; color:var(--gray-600);}
+  .m-seg button.active{background:var(--navy); color:#fff;}
+  .m-goal{background:linear-gradient(135deg,var(--navy),#123049); color:#fff; border-radius:14px; padding:14px 16px; margin-bottom:12px;}
+  .m-goal .bar-wrap{height:7px; background:rgba(255,255,255,.2); border-radius:6px; margin-top:8px; overflow:hidden;}
+  .m-goal .bar{height:100%; background:#fff; border-radius:6px;}
+  .m-stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+  .m-stat{background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:10px 12px;}
+  .m-stat .n{font-size:19px; font-weight:800;}
+  .m-stat .l{font-size:11px; color:var(--gray-600);}
+  .m-stat.risk .n{color:var(--red);}
+  .m-cta{background:var(--cyan-light); border:1px solid #b9eef2; border-radius:12px; padding:12px 14px; margin-bottom:12px; font-size:12.5px; color:var(--cyan-dark); font-weight:700; display:flex; align-items:center; justify-content:space-between;}
+  .m-visit{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--gray-100);}
+  .m-visit:last-child{border-bottom:0;}
+  .m-visit .t{font-weight:800; font-size:13px; width:44px;}
+  .m-visit .n{flex:1; font-size:13px; font-weight:700;}
+  .m-visit .n small{display:block; font-weight:500; color:var(--gray-600); font-size:11px;}
+  .m-tagline{font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.4px;}
+  .foc-item{border-left:4px solid var(--blue); background:#fff; border-radius:10px; padding:12px 14px; margin-bottom:10px; box-shadow:var(--shadow);}
+  .foc-item.crit{border-left-color:var(--red);}
+  .foc-item.opp{border-left-color:var(--green);}
+  .foc-item.cross{border-left-color:var(--cyan);}
+  .foc-item.visit{border-left-color:var(--amber);}
+  .foc-item .tag{font-size:10px; font-weight:800; text-transform:uppercase; color:var(--gray-600); margin-bottom:3px;}
+  .foc-item h4{margin:0 0 8px; font-size:13.5px; line-height:1.4;}
+  .foc-item a.action{font-size:12.5px; font-weight:800; color:var(--blue);}
+
+  .m-filters{display:flex; gap:6px; overflow-x:auto; padding-bottom:10px; margin-bottom:2px;}
+  .m-filters .chip{white-space:nowrap;}
+  .chip{display:inline-flex; align-items:center; padding:6px 13px; border-radius:999px; border:1px solid var(--gray-300); font-size:12.5px; font-weight:600; color:var(--gray-600); background:#fff;}
+  .chip.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .client-card{display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:11px 13px; margin-bottom:10px; box-shadow:var(--shadow);}
+  .client-card .score{width:38px;height:38px;border-radius:50%; border:2px solid var(--green); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--green); flex-shrink:0;}
+  .client-card.risk .score{border-color:var(--red); color:var(--red);}
+  .client-card .info{flex:1; min-width:0;}
+  .client-card .info b{font-size:13.5px; display:block;}
+  .client-card .info span{font-size:11px; color:var(--gray-600);}
+  .client-card .metrics{text-align:right; font-size:11px; color:var(--gray-600); flex-shrink:0;}
+  .client-card .metrics b{display:block; font-size:13px; color:var(--gray-900);}
+
+  .c360-head{background:#fff; border:1px solid var(--gray-200); border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow);}
+  .c360-head .row{display:flex; align-items:center; gap:12px;}
+  .c360-head .score{width:46px;height:46px;border-radius:50%; border:3px solid var(--green); display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:var(--green); flex-shrink:0;}
+  .c360-head .score small{font-size:7px; font-weight:700; color:var(--gray-600);}
+  .c360-head h2{margin:0; font-size:16px;}
+  .c360-head .place{font-size:12px; color:var(--gray-600);}
+  .c360-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px;}
+  .c360-grid .b{background:var(--gray-50); border-radius:8px; padding:8px; text-align:center;}
+  .c360-grid .b .l{font-size:9.5px; text-transform:uppercase; color:var(--gray-600); font-weight:700;}
+  .c360-grid .b .v{font-weight:800; font-size:13.5px;}
+  .badge{display:inline-block; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:800;}
+  .badge.ouro{background:#fbeecb; color:#96731a;}
+  .badge.prata{background:var(--gray-100); color:var(--gray-600);}
+
+  .m-tabs{display:flex; background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:3px; margin-bottom:12px;}
+  .m-tabs button{flex:1; border:0; background:transparent; padding:8px; border-radius:8px; font-size:12px; font-weight:700; color:var(--gray-600);}
+  .m-tabs button.active{background:var(--blue); color:#fff;}
+  .m-subtabs{display:flex; gap:14px; overflow-x:auto; border-bottom:1px solid var(--gray-200); margin-bottom:12px; font-size:12.5px; font-weight:700; color:var(--gray-600);}
+  .m-subtabs span{padding-bottom:8px; white-space:nowrap;}
+  .m-subtabs span.active{color:var(--blue); border-bottom:2px solid var(--blue);}
+  .ia-box{background:var(--cyan-light); border:1px solid #b9eef2; border-radius:12px; padding:13px 14px; margin-bottom:12px; font-size:12.5px; color:#0a5a63; line-height:1.6;}
+  .ia-box b{display:block; color:var(--cyan-dark); margin-bottom:4px; font-size:12.5px;}
+
+  .timeline-group{margin-bottom:16px;}
+  .timeline-group h5{font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-600); margin:0 0 8px;}
+  .t-item{display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--gray-100);}
+  .t-item .ic{width:26px; height:26px; border-radius:8px; background:var(--gray-100); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:12px;}
+  .t-item .body{flex:1;}
+  .t-item .body b{font-size:12.5px; display:block;}
+  .t-item .body span{font-size:11.5px; color:var(--gray-600);}
+  .t-item .time{font-size:11px; color:var(--gray-400); white-space:nowrap;}
+
+  .route-box{background:var(--navy); border-radius:12px; height:110px; position:relative; margin-bottom:12px; overflow:hidden;}
+  .route-box .badge2{position:absolute; bottom:8px; left:10px; background:rgba(255,255,255,.15); color:#fff; font-size:11px; padding:4px 9px; border-radius:8px;}
+  .agenda-stop{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:11px 13px; margin-bottom:10px;}
+  .agenda-stop .num{width:26px;height:26px;border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;}
+  .agenda-stop .info{flex:1;}
+  .agenda-stop .info b{display:block; font-size:13px;}
+  .agenda-stop .info span{font-size:11px; color:var(--gray-600);}
+
+  .step-dots{display:flex; gap:5px; margin-bottom:16px;}
+  .step-dots i{flex:1; height:4px; border-radius:4px; background:var(--gray-200);}
+  .step-dots i.on{background:var(--blue);}
+  .radio-row{display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:14px 16px; margin-bottom:10px; font-size:13.5px; font-weight:600;}
+  .radio-row.sel{border-color:var(--blue); background:var(--blue-light);}
+  .radio-dot{width:18px;height:18px;border-radius:50%; border:2px solid var(--gray-300);}
+  .radio-row.sel .radio-dot{border-color:var(--blue); background:var(--blue); box-shadow:inset 0 0 0 3px #fff;}
+  .offline-badge{font-size:10.5px; color:var(--amber); font-weight:800;}
+
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-600); font-weight:700; margin-bottom:5px;}
+  .field input{width:100%; border:1px solid var(--gray-300); border-radius:9px; padding:10px 12px; font-size:13.5px; background:#fff;}
+  .chip-grid{display:flex; flex-wrap:wrap; gap:7px;}
+
+  .react-card{background:#fff; border:1px solid var(--gray-200); border-radius:14px; padding:14px 15px; margin-bottom:12px; box-shadow:var(--shadow);}
+  .react-card .top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .react-card h4{margin:0 0 2px; font-size:14px;}
+  .react-card .seg{font-size:11.5px; color:var(--gray-600);}
+  .react-card .rent{text-align:right; font-size:10.5px; font-weight:800; text-transform:uppercase;}
+  .react-card .rent.alta{color:var(--green);} .react-card .rent.media{color:var(--amber);}
+  .prob-bar-wrap{height:6px; background:var(--gray-100); border-radius:6px; margin:9px 0 6px; overflow:hidden;}
+  .prob-bar{height:100%; border-radius:6px;}
+  .react-card .why{background:var(--gray-50); border-radius:8px; padding:8px 10px; font-size:12px; color:var(--gray-600); margin:8px 0 10px;}
+
+  .risk-card{background:#fff; border-radius:14px; padding:14px 15px; margin-bottom:12px; box-shadow:var(--shadow); border-left:5px solid var(--red);}
+  .risk-card.amber{border-left-color:var(--amber);}
+  .risk-card .top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .risk-card h4{margin:0 0 2px; font-size:14px;}
+  .risk-card .seg{font-size:11.5px; color:var(--gray-600);}
+  .risk-card .pct{font-size:19px; font-weight:800; color:var(--red);}
+  .risk-card.amber .pct{color:var(--amber);}
+  .risk-card ul{margin:10px 0; padding-left:16px; font-size:12px; color:var(--gray-600); line-height:1.7;}
+  .risk-card .actions{display:flex; gap:8px;}
+  .risk-card .actions .btn{flex:1;}
+
+  .btn{border:0; border-radius:9px; padding:9px 16px; font-size:13px; font-weight:700; background:var(--blue); color:#fff;}
+  .btn:hover{background:var(--blue-dark);}
+  .btn.sm{padding:7px 12px; font-size:12.5px;}
+  .btn.ghost{background:#fff; color:var(--gray-900); border:1px solid var(--gray-300);}
+  .btn.block{width:100%;}
+
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff;
+    padding:12px 20px; border-radius:10px; font-size:13.5px; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:999; display:flex; align-items:center; gap:8px;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  /* ---------- click affordance ---------- */
+  [data-go], [data-action]{cursor:pointer;}
+  .btn,.chip,.pill,.m-seg button,.m-tabs button,.qty-btn,.wiz-chip{transition:transform .08s ease;}
+  .btn:active,.chip:active,.pill:active,.m-seg button:active,.m-tabs button:active,.qty-btn:active,.wiz-chip:active{transform:scale(.94);}
+  .m-card[data-go],.client-card,.risk-card,.react-card,.agenda-stop{transition:transform .1s ease, box-shadow .15s ease;}
+  .m-card[data-go]:active,.client-card:active,.risk-card:active,.react-card:active,.agenda-stop:active{transform:scale(.98);}
+  .is-done{opacity:.55;}
+  .done-badge{background:var(--green-light); color:var(--green); font-weight:800; font-size:11.5px; padding:6px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;}
+
+  /* ---------- login ---------- */
+  .login-page{flex:1; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(1200px 500px at 10% -10%, #14304f 0%, var(--navy) 45%, #081420 100%); padding:20px;}
+  .login-card{width:360px; max-width:100%; background:#fff; border-radius:18px; padding:34px 30px; box-shadow:0 20px 60px rgba(0,0,0,.35);}
+  .login-logo{font-size:15px; font-weight:800; margin-bottom:18px;}
+  .login-card h2{margin:0 0 4px; font-size:20px;}
+  .login-err{background:var(--red-light); color:var(--red); font-size:12.5px; font-weight:700; padding:9px 12px; border-radius:9px; margin-bottom:12px;}
+  .login-hint{text-align:center; font-size:12px; color:var(--gray-600); margin:16px 0 0;}
+  @keyframes shake{10%,90%{transform:translateX(-1px);}20%,80%{transform:translateX(2px);}30%,50%,70%{transform:translateX(-4px);}40%,60%{transform:translateX(4px);}}
+  .shake{animation:shake .4s;}
+
+  /* ---------- activity feed ---------- */
+  .activity-feed{margin-top:18px; background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow);}
+  .activity-feed h4{margin:0 0 8px; font-size:13px;}
+  .activity-item{display:flex; gap:8px; font-size:12.5px; color:var(--gray-600); padding:6px 0; border-bottom:1px solid var(--gray-100);}
+  .activity-item:last-child{border-bottom:0;}
+  .activity-item .dot{width:6px;height:6px;border-radius:50%; background:var(--cyan); margin-top:5px; flex-shrink:0;}
+
+  /* ---------- visita wizard ---------- */
+  .wiz-chip-grid{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+  .wiz-chip{padding:9px 14px; border-radius:10px; border:1px solid var(--gray-300); font-size:13px; font-weight:600; background:#fff;}
+  .wiz-chip.sel{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .qty-row{display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:10px 12px; margin-bottom:8px;}
+  .qty-controls{display:flex; align-items:center; gap:10px;}
+  .qty-btn{width:26px;height:26px;border-radius:8px; border:1px solid var(--gray-300); background:#fff; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center;}
+  .photo-slot{width:56px;height:56px;border-radius:10px; border:2px dashed var(--gray-300); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--gray-400);}
+  .wiz-summary-row{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px solid var(--gray-100);}
+  textarea{width:100%; border:1px solid var(--gray-300); border-radius:9px; padding:10px 12px; font-size:13.5px; font-family:inherit; resize:vertical; min-height:80px;}
+</style>
+
+<div id="toast" class="toast"></div>
+<div id="root"></div>
+
+<script>
+/* ============================= DATA ============================= */
+const CLIENTS = [
+  {id:'santaclara', name:'Hospital Santa Clara', segment:'Hospitalar', cidade:'Uberlândia/MG', badge:'Ouro', score:94,
+    fat:'R$ 312k', ultimoPedidoDias:6, tendencia:'up', churn:'Baixa', churnPct:6, ticket:'R$ 26k', freq:'12 / ano',
+    pendencias:'2 abertas', chamados:'0 críticos', ultimoPedidoValor:'R$ 31,2k',
+    resumo:'Cliente saudável e fiel. Compra com regularidade há 4 anos e responde bem a lançamentos da linha hospitalar. Oportunidade clara de cross-sell com Asseptgel Pro — 87% de clientes similares já compram.',
+    briefing:'Relacionamento sólido, churn baixo. Foque em cross-sell de Asseptgel Pro (87% de similares compram) e antecipe a renovação anual (R$ 180k, fecha 15/jul). Cuidado com pressão de preço do Concorrente A em desinfetantes.',
+    oportunidade:{nome:'Asseptgel Pro', valor:'+R$ 42k/ano'}, renovacao:{valor:'R$ 180k', data:'prev. 15/jul'}, pagamento:{status:'Em dia', titulos:'R$ 12,3k'},
+    timeline:{
+      'Hoje':[
+        {ic:'✦', titulo:'AzulIA sugeriu cross-sell', desc:'Asseptgel Pro recomendado para esta conta', hora:'08:30'},
+        {ic:'☎', titulo:'Ligação realizada', desc:'Confirmou recebimento do pedido #48213', hora:'09:12'},
+        {ic:'◆', titulo:'WhatsApp enviado', desc:'Catálogo da linha hospitalar 2026', hora:'09:40'},
+      ],
+      'Ontem':[
+        {ic:'▤', titulo:'Pedido registrado', desc:'#48213 · 14 itens · R$ 31,2k', hora:'16:22'},
+        {ic:'◉', titulo:'Visita realizada', desc:'Check-in GPS · 38 min · 4 fotos', hora:'14:05'},
+      ],
+      'Esta semana':[
+        {ic:'!', titulo:'Reclamação registrada', desc:'Atraso na entrega — resolvida em 1 dia', hora:'24/jun'},
+        {ic:'✉', titulo:'E-mail enviado', desc:'Proposta de renovação anual', hora:'23/jun'},
+        {ic:'☎', titulo:'Ligação realizada', desc:'Alinhamento de calendário de entregas', hora:'22/jun'},
+      ],
+    }},
+  {id:'mercadouniao', name:'Mercado União', segment:'Azulim · Varejo', cidade:'Uberaba/MG', badge:'Ouro', score:90,
+    fat:'R$ 246k', ultimoPedidoDias:9, tendencia:'up', churn:'Baixa', churnPct:9, ticket:'R$ 18k', freq:'14 / ano',
+    pendencias:'0 abertas', chamados:'0 críticos', ultimoPedidoValor:'R$ 19,4k',
+    resumo:'Conta Azulim de alto giro, forte no varejo local. Boa aderência a promoções sazonais.',
+    briefing:'Cliente estável, sem sinais de churn. Explorar reposição automática de linha de limpeza e reforçar presença de gôndola.',
+    oportunidade:{nome:'Linha Azulim Concentrado', valor:'+R$ 18k/ano'}, renovacao:{valor:'-', data:'sem contrato formal'}, pagamento:{status:'Em dia', titulos:'R$ 0'},
+    timeline:{'Hoje':[{ic:'◉', titulo:'Visita agendada', desc:'11:00 · rota 8 min', hora:'a confirmar'}], 'Esta semana':[{ic:'▤', titulo:'Pedido registrado', desc:'#48190 · 9 itens', hora:'25/jun'}]}},
+  {id:'frigorifico', name:'Frigorífico Vale Verde', segment:'Institucional', cidade:'Patos de Minas/MG', badge:'Ouro', score:88,
+    fat:'R$ 203k', ultimoPedidoDias:4, tendencia:'up', churn:'Baixa', churnPct:8, ticket:'R$ 24k', freq:'10 / ano',
+    pendencias:'1 aberta', chamados:'0 críticos', ultimoPedidoValor:'R$ 24,8k',
+    resumo:'Conta institucional em expansão, aceitou recentemente proposta concorrente pontual (Qualifood) — atenção à fidelização.',
+    briefing:'Oportunidade quente: aceitou proposta de mix da Qualifood. Registrar pedido e reforçar relacionamento antes da renovação.',
+    oportunidade:{nome:'Linha sanitização técnica', valor:'+R$ 22k/ano'}, renovacao:{valor:'R$ 90k', data:'prev. 30/ago'}, pagamento:{status:'Em dia', titulos:'R$ 4,1k'},
+    timeline:{'Hoje':[{ic:'✦', titulo:'Oportunidade quente', desc:'Aceitou proposta de mix da Qualifood', hora:'08:05'}]}},
+  {id:'agrocerrado', name:'Agro Cerrado Insumos', segment:'Agro', cidade:'Uberlândia/MG', badge:'Ouro', score:85,
+    fat:'R$ 178k', ultimoPedidoDias:11, tendencia:'up', churn:'Baixa', churnPct:11, ticket:'R$ 21k', freq:'8 / ano',
+    pendencias:'0 abertas', chamados:'1 crítico', ultimoPedidoValor:'R$ 21,0k',
+    resumo:'Cliente agro fiel, sazonalidade forte na safra. Boa resposta a adjuvantes de aderência.',
+    briefing:'Reforçar tecnologia de aderência para próxima safra. Resolver chamado técnico crítico em aberto antes da visita.',
+    oportunidade:{nome:'Adjuvante Aderix', valor:'+R$ 15k/ano'}, renovacao:{valor:'-', data:'sem contrato'}, pagamento:{status:'Em dia', titulos:'R$ 0'},
+    timeline:{'Esta semana':[{ic:'!', titulo:'Chamado técnico aberto', desc:'Dúvida sobre dosagem em campo', hora:'26/jun'}]}},
+  {id:'bella', name:'Distribuidora Bella', segment:'Cosméticos', cidade:'Uberlândia/MG', badge:'Prata', score:80,
+    fat:'R$ 96k', ultimoPedidoDias:18, tendencia:'flat', churn:'Média', churnPct:28, ticket:'R$ 9k', freq:'9 / ano',
+    pendencias:'1 aberta', chamados:'0 críticos', ultimoPedidoValor:'R$ 9,6k',
+    resumo:'Conta de cosméticos com giro médio. Sinal de leve desaceleração no último trimestre.',
+    briefing:'Sugerir linha Vernissage para diferenciação de mix e reverter leve queda de frequência.',
+    oportunidade:{nome:'Linha Vernissage', valor:'+R$ 11k/ano'}, renovacao:{valor:'-', data:'sem contrato'}, pagamento:{status:'Em dia', titulos:'R$ 2,2k'},
+    timeline:{'Esta semana':[{ic:'☎', titulo:'Ligação realizada', desc:'Follow-up de proposta enviada', hora:'27/jun'}]}},
+  {id:'petcenter', name:'Pet Center Patas & Cia', segment:'Pet', cidade:'Uberlândia/MG', badge:'Prata', score:46,
+    fat:'R$ 54k', ultimoPedidoDias:52, tendencia:'down', churn:'Alta', churnPct:71, ticket:'R$ 5k', freq:'4 / ano',
+    pendencias:'0 abertas', chamados:'0 críticos', ultimoPedidoValor:'R$ 5,1k',
+    resumo:'Conta em risco alto de churn, sem resposta nos últimos contatos.',
+    briefing:'Sem resposta nos últimos contatos, sinais de migração para marca regional e queda de mix. Agir com urgência.',
+    oportunidade:{nome:'-', valor:'-'}, renovacao:{valor:'-', data:'-'}, pagamento:{status:'Em dia', titulos:'R$ 0'},
+    riscoMotivos:['Sem resposta nos últimos contatos','Migração para marca regional','Queda de mix'],
+    timeline:{'Esta semana':[{ic:'!', titulo:'Sem resposta', desc:'3ª tentativa de contato sem retorno', hora:'26/jun'}]}},
+  {id:'xpto', name:'Hospital XPTO', segment:'Hospitalar', cidade:'Araguari/MG', badge:'Prata', score:38,
+    fat:'R$ 88k', ultimoPedidoDias:47, tendencia:'down', churn:'Alta', churnPct:84, ticket:'R$ 7k', freq:'5 / ano',
+    pendencias:'2 abertas', chamados:'1 crítico', ultimoPedidoValor:'R$ 7,4k',
+    resumo:'Risco crítico de churn, concorrente entrando via licitação.',
+    briefing:'Perdeu frequência de compra, Concorrente A entrando via licitação e redução de ticket médio. Janela de ação curta.',
+    oportunidade:{nome:'-', valor:'-'}, renovacao:{valor:'-', data:'-'}, pagamento:{status:'Atrasado', titulos:'R$ 8,9k'},
+    riscoMotivos:['Perdeu frequência de compra','Concorrente A entrando via licitação','Redução de ticket médio'],
+    timeline:{'Hoje':[{ic:'!', titulo:'Risco crítico sinalizado', desc:'AzulIA recomenda ligação imediata', hora:'07:50'}]}},
+  {id:'laticinios', name:'Laticínios Serra Azul', segment:'Institucional', cidade:'Patrocínio/MG', badge:'Prata', score:52,
+    fat:'R$ 61k', ultimoPedidoDias:38, tendencia:'down', churn:'Alta', churnPct:66, ticket:'R$ 6k', freq:'6 / ano',
+    pendencias:'1 aberta', chamados:'0 críticos', ultimoPedidoValor:'R$ 6,3k',
+    resumo:'Atrasos recorrentes em pedidos e pressão de preço no segmento.',
+    briefing:'Atraso recorrente em pedidos, pressão de preço no segmento e frequência caindo. Rever condições comerciais.',
+    oportunidade:{nome:'-', valor:'-'}, renovacao:{valor:'-', data:'-'}, pagamento:{status:'Em dia', titulos:'R$ 3,1k'},
+    riscoMotivos:['Atraso recorrente em pedidos','Pressão de preço no segmento','Frequência caindo'],
+    timeline:{'Esta semana':[{ic:'!', titulo:'Atraso em pedido', desc:'2ª ocorrência no mês', hora:'25/jun'}]}},
+  {id:'saborm ineiro'.trim(), name:'Restaurante Sabor Mineiro', segment:'Food service', cidade:'Uberlândia/MG', badge:'Prata', score:60,
+    fat:'R$ 40k', ultimoPedidoDias:180, tendencia:'down', churn:'Alta', churnPct:35, ticket:'R$ 4k', freq:'0 / ano (inativo)',
+    pendencias:'0 abertas', chamados:'0 críticos', ultimoPedidoValor:'R$ 4,4k',
+    resumo:'Inativo há 6 meses, alta rentabilidade histórica. Motivo provável: troca de comprador.',
+    briefing:'Inativo há 6 meses, alta rentabilidade histórica. Sem contato desde a troca de comprador. Chance de retorno 72%.',
+    oportunidade:{nome:'-', valor:'-'}, renovacao:{valor:'-', data:'-'}, pagamento:{status:'Em dia', titulos:'R$ 0'},
+    reativacao:{rentabilidade:'Alta', chance:72, motivo:'Troca de comprador — sem contato desde então'},
+    timeline:{}},
+  {id:'vidaplena', name:'Clínica Vida Plena', segment:'Institucional', cidade:'Ituiutaba/MG', badge:'Prata', score:58,
+    fat:'R$ 35k', ultimoPedidoDias:150, tendencia:'down', churn:'Alta', churnPct:31, ticket:'R$ 3k', freq:'0 / ano (inativo)',
+    pendencias:'0 abertas', chamados:'0 críticos', ultimoPedidoValor:'R$ 3,2k',
+    resumo:'Inativo há 5 meses. RCA anterior saiu e conta ficou órfã.',
+    briefing:'RCA anterior saiu; conta ficou órfã. Alta rentabilidade histórica. Chance de retorno 69%.',
+    oportunidade:{nome:'-', valor:'-'}, renovacao:{valor:'-', data:'-'}, pagamento:{status:'Em dia', titulos:'R$ 0'},
+    reativacao:{rentabilidade:'Alta', chance:69, motivo:'RCA anterior saiu; conta ficou órfã'},
+    timeline:{}},
+  {id:'autotrevo', name:'Auto Posto Trevo', segment:'Auto', cidade:'Araguari/MG', badge:'Prata', score:55,
+    fat:'R$ 28k', ultimoPedidoDias:120, tendencia:'down', churn:'Média', churnPct:24, ticket:'R$ 3k', freq:'2 / ano',
+    pendencias:'0 abertas', chamados:'0 críticos', ultimoPedidoValor:'R$ 2,9k',
+    resumo:'Reduziu frequência após reajuste de preços.',
+    briefing:'Reduziu frequência após reajuste. Rentabilidade média. Chance de retorno 64%.',
+    oportunidade:{nome:'-', valor:'-'}, renovacao:{valor:'-', data:'-'}, pagamento:{status:'Em dia', titulos:'R$ 0'},
+    reativacao:{rentabilidade:'Média', chance:64, motivo:'Reduziu frequência após reajuste'},
+    timeline:{}},
+];
+const byId = id => CLIENTS.find(c=>c.id===id);
+
+const FOCO_DIA = [
+  {id:'foco1', tipo:'crit', tag:'Risco crítico', titulo:'Hospital XPTO — 47 dias sem compra, churn 84%', cta:'Ligar agora', nav:{mscreen:'c360', clientId:'xpto'}},
+  {id:'foco2', tipo:'opp', tag:'Oportunidade quente', titulo:'Frigorífico Vale Verde aceitou proposta de Qualifood', cta:'Registrar pedido', nav:{mscreen:'c360', clientId:'frigorifico'}},
+  {id:'foco3', tipo:'cross', tag:'Cross-sell AzulIA', titulo:'Hospital Santa Clara — 87% de similares levam Asseptgel Pro', cta:'Ver mix ideal', nav:{mscreen:'c360', clientId:'santaclara'}},
+  {id:'foco4', tipo:'visit', tag:'Visita agendada', titulo:'Mercado União às 11:00 — rota 8 min', cta:'Abrir visita', nav:{mscreen:'agenda'}},
+];
+
+const AGENDA = [
+  {num:1, nome:'Hospital Santa Clara', hora:'09:00', km:'3,2 km', tag:'Cliente Ouro', id:'santaclara'},
+  {num:2, nome:'Mercado União', hora:'11:00', km:'8,1 km', tag:'Azulim', id:'mercadouniao'},
+  {num:3, nome:'Frigorífico Vale Verde', hora:'14:00', km:'15 km', tag:'Institucional', id:'frigorifico'},
+];
+
+/* ============================= AUTH & APP STATE ============================= */
+function loadJSON(key, fallback){
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
+}
+function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+const AUTH = loadJSON('sq_app_auth', {loggedIn:false, user:null});
+const APP = loadJSON('sq_app_state', {doneFoco:[], doneReact:[], doneRisk:[], visits:{}, activities:[], leads:[]});
+function saveApp(){ saveJSON('sq_app_state', APP); }
+function nowHM(){ return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function logActivity(msg){
+  APP.activities.unshift({msg, time:nowHM()});
+  APP.activities = APP.activities.slice(0,8);
+  saveApp();
+}
+
+/* ============================= STATE ============================= */
+const S = { mscreen:'home', mhome:'cartoes', mfilter:'Todos', mseg:null, clientId:'santaclara', c360tab:'briefing', c360sub:'Resumo',
+  leadSeg:null, wiz:{step:0, objetivo:null, produtos:[], qtd:{}, obs:'', fotos:0} };
+
+function go(patch){
+  if(patch.mscreen==='visita' && S.mscreen!=='visita'){
+    patch = Object.assign({}, patch, {wiz:{step:0, objetivo:null, produtos:[], qtd:{}, obs:'', fotos:0}});
+  }
+  Object.assign(S, patch); render();
+  const c = document.querySelector('.phone-content'); if(c) c.scrollTop = 0;
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.innerHTML = '✓ '+msg; t.classList.add('show');
+  clearTimeout(window.__toastT); window.__toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  if(u.toLowerCase()==='admin' && p==='admin'){
+    AUTH.loggedIn = true; AUTH.user = 'admin'; saveJSON('sq_app_auth', AUTH);
+    render();
+  } else {
+    const card = document.getElementById('loginCard');
+    document.getElementById('loginError').style.display = 'block';
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+  }
+}
+function doLogout(){
+  AUTH.loggedIn = false; AUTH.user = null; saveJSON('sq_app_auth', AUTH);
+  render();
+}
+function markFocoDone(el){
+  const id = el.getAttribute('data-id'); const label = el.getAttribute('data-label');
+  if(!APP.doneFoco.includes(id)){ APP.doneFoco.push(id); saveApp(); logActivity(`Resolvido: "${label}"`); }
+  toast('Marcado como resolvido');
+  render();
+}
+function markReactDone(el){
+  const id = el.getAttribute('data-id'); const name = el.getAttribute('data-label');
+  if(!APP.doneReact.includes(id)){ APP.doneReact.push(id); saveApp(); logActivity(`Visita de reativação planejada para ${name}`); }
+  toast(`Visita planejada para ${name}`);
+  render();
+}
+function markRiskDone(el){
+  const id = el.getAttribute('data-id'); const name = el.getAttribute('data-label');
+  if(!APP.doneRisk.includes(id)){ APP.doneRisk.push(id); saveApp(); logActivity(`Ação registrada para conta em risco: ${name}`); }
+  toast(`Ação registrada para ${name}`);
+  render();
+}
+function saveLead(){
+  const empresa = document.getElementById('leadEmpresa').value.trim();
+  const nome = document.getElementById('leadNome').value.trim();
+  if(!empresa){ toast('Informe ao menos o nome da empresa'); return; }
+  APP.leads.unshift({nome:nome||'(sem contato)', empresa, segmento:S.leadSeg, hora:nowHM()});
+  saveApp(); logActivity(`Lead qualificado: ${empresa}`);
+  S.leadSeg = null;
+  toast('Lead qualificado com sucesso!');
+  render();
+}
+
+function wizNext(){ if(S.wiz.step<7){ S.wiz.step++; render(); } }
+function wizBack(){ if(S.wiz.step>0){ S.wiz.step--; render(); } else { go({mscreen:'agenda'}); } }
+function wizToggleProd(val){
+  const i = S.wiz.produtos.indexOf(val);
+  if(i>=0){ S.wiz.produtos.splice(i,1); delete S.wiz.qtd[val]; }
+  else { S.wiz.produtos.push(val); S.wiz.qtd[val] = 1; }
+  render();
+}
+function wizQty(val, delta){
+  const cur = S.wiz.qtd[val]||0;
+  S.wiz.qtd[val] = Math.max(0, cur+delta);
+  render();
+}
+function wizPhoto(){ S.wiz.fotos = Math.min(6, S.wiz.fotos+1); render(); }
+function wizFinish(){
+  const c = byId(S.clientId);
+  APP.visits[c.id] = 'done';
+  const totalItens = Object.values(S.wiz.qtd).reduce((a,b)=>a+b,0);
+  saveApp();
+  logActivity(`Visita concluída em ${c.name}${totalItens? ' · pedido com '+totalItens+' itens':''}`);
+  if(!c.timeline['Hoje']) c.timeline['Hoje'] = [];
+  c.timeline['Hoje'].unshift({ic:'◉', titulo:'Visita concluída', desc: totalItens? `Pedido registrado em campo · ${totalItens} itens` : 'Check-in e briefing realizados', hora: nowHM()});
+  toast('Visita concluída com sucesso!');
+  go({mscreen:'agenda'});
+}
+
+/* ============================= RENDER ROOT ============================= */
+function render(){
+  const root = document.getElementById('root');
+  if(!AUTH.loggedIn){ root.innerHTML = renderLogin(); return; }
+  root.innerHTML = topStrip() + renderMobile();
+}
+
+function renderLogin(){
+  return `<div class="login-page">
+    <div class="login-card" id="loginCard">
+      <div class="login-logo">🧪 Start <span class="brand-ia">Química</span></div>
+      <h2>Entrar no app do RCA</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 20px;">Ambiente de demonstração · Onze</p>
+      <div class="field"><label>Usuário</label><input id="loginUser" value="admin" autocomplete="username"></div>
+      <div class="field"><label>Senha</label><input id="loginPass" type="password" value="admin" autocomplete="current-password"></div>
+      <div id="loginError" class="login-err" style="display:none;">Usuário ou senha inválidos.</div>
+      <button class="btn block" data-action="login">Entrar →</button>
+      <p class="login-hint">Use <b>admin</b> / <b>admin</b> para acessar a demonstração.</p>
+    </div>
+  </div>`;
+}
+
+function topStrip(){
+  return `<div class="topstrip">
+    <span class="brand">🧪 App do RCA</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="muted" style="font-size:12px;">${AUTH.user||'admin'}</span>
+      <button class="pill" data-action="logout">Sair</button>
+    </div>
+  </div>`;
+}
+
+/* ============================= MOBILE ============================= */
+const TABS = [
+  {id:'home', ic:'⌂', label:'Início'},
+  {id:'carteira', ic:'▤', label:'Carteira'},
+  {id:'agenda', ic:'▦', label:'Agenda'},
+  {id:'azulia', ic:'✦', label:'AzulIA'},
+  {id:'risco', ic:'◉', label:'Risco'},
+];
+
+function renderMobile(){
+  return `<div class="phone-page">
+    <div class="phone-frame">
+      <div class="phone-content">${mobileScreen()}</div>
+      <div class="phone-tabbar">
+        ${TABS.map(t=>`<a class="${S.mscreen===t.id?'active':''}" data-go='{"mscreen":"${t.id}"}'><span class="ic">${t.ic}</span>${t.label}</a>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function mobileScreen(){
+  if(S.mscreen==='home') return mHome();
+  if(S.mscreen==='carteira') return mCarteira();
+  if(S.mscreen==='agenda') return mAgenda();
+  if(S.mscreen==='azulia') return mAzulIA();
+  if(S.mscreen==='risco') return mRisco();
+  if(S.mscreen==='c360') return mCliente360();
+  if(S.mscreen==='timeline') return mTimeline();
+  if(S.mscreen==='visita') return mVisita();
+  if(S.mscreen==='novolead') return mNovoLead();
+  if(S.mscreen==='reativacao') return mReativacao();
+  return '';
+}
+
+function mHello(){
+  return `<div class="m-hello">
+    <div class="av">CE</div>
+    <div><h2>Bom dia, Carlos</h2><span>Seg, 29 jun · 12 visitas hoje</span></div>
+    <div class="sparkle">✦</div>
+  </div>`;
+}
+
+function mHome(){
+  return `${mHello()}
+  <div class="m-seg">
+    <button class="${S.mhome==='cartoes'?'active':''}" data-go='{"mhome":"cartoes"}'>Cartões</button>
+    <button class="${S.mhome==='foco'?'active':''}" data-go='{"mhome":"foco"}'>Foco do dia · IA</button>
+  </div>
+  ${S.mhome==='cartoes' ? `
+    <div class="m-goal">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;"><b>Meta do mês</b><span>Ranking #3/18</span></div>
+      <div style="font-size:19px;font-weight:800;margin-top:4px;">R$ 420k / R$ 600k</div>
+      <div class="bar-wrap"><div class="bar" style="width:70%"></div></div>
+      <div style="font-size:11.5px;color:#bcd6ea;margin-top:6px;">Faltam R$ 180k · 70% concluído</div>
+    </div>
+    <div class="m-stat-grid">
+      <div class="m-stat risk"><div class="n">8</div><div class="l">clientes em risco</div></div>
+      <div class="m-stat"><div class="n" style="color:var(--green)">5</div><div class="l">oportunidades quentes</div></div>
+      <div class="m-stat"><div class="n">12</div><div class="l">visitas programadas</div></div>
+      <div class="m-stat"><div class="n">6</div><div class="l">clientes p/ reativar</div></div>
+    </div>
+    <div class="m-cta" data-go='{"mscreen":"c360","clientId":"santaclara"}'>
+      <span>✦ 3 sugestões de cross-sell — AzulIA encontrou mix ideal p/ 3 clientes</span><span>→</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><h3 style="margin:0;font-size:14px;">Visitas de hoje</h3><a class="m-tagline" style="color:var(--blue)" data-go='{"mscreen":"carteira"}'>Ver carteira</a></div>
+    <div class="m-card">
+      <div class="m-visit"><div class="t">09:00</div><div class="n">Hospital Santa Clara<small>Cliente Ouro · 3,2 km</small></div><span class="badge" style="background:var(--green-light);color:var(--green);">Confirmada</span></div>
+      <div class="m-visit"><div class="t">11:00</div><div class="n">Mercado União<small>Azulim · 8,1 km</small></div><span class="badge ouro" style="background:var(--amber-light);color:var(--amber);">A confirmar</span></div>
+    </div>
+  ` : `
+    <div class="m-card" style="background:linear-gradient(135deg,var(--navy),#123049); color:#fff; border:0;">
+      <b style="display:block;margin-bottom:2px;">✦ AzulIA priorizou seu dia</b>
+      <span style="font-size:12px;color:#bcd6ea;">5 ações ordenadas por impacto e urgência</span>
+    </div>
+    ${FOCO_DIA.map(f=>{ const done = APP.doneFoco.includes(f.id); return `<div class="foc-item ${f.tipo} ${done?'is-done':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="flex:1;"><div class="tag">${f.tag}</div><h4 style="${done?'text-decoration:line-through;color:var(--gray-400);':''}">${f.titulo}</h4></div>
+        ${done?'':`<button class="qty-btn" title="Marcar como resolvido" data-action="mark-foco" data-id="${f.id}" data-label="${f.titulo}">✓</button>`}
+      </div>
+      ${done?`<span class="done-badge">✓ Resolvido</span>`:`<a class="action" data-go='${JSON.stringify(f.nav)}'>${f.cta} →</a>`}
+    </div>`;}).join('')}
+  `}`;
+}
+
+function mCarteira(){
+  const filters = ['Todos','Alto potencial','Em risco','Sem compra +30d'];
+  const segs = ['Novos','VIP','Institucional','Agro','Azulim'];
+  let list = CLIENTS;
+  if(S.mfilter==='Alto potencial') list = list.filter(c=>c.score>=85);
+  else if(S.mfilter==='Em risco') list = list.filter(c=>c.churn==='Alta');
+  else if(S.mfilter==='Sem compra +30d') list = list.filter(c=>c.ultimoPedidoDias>=30);
+  if(S.mseg==='Institucional') list = list.filter(c=>c.segment.includes('Institucional'));
+  else if(S.mseg==='Agro') list = list.filter(c=>c.segment.includes('Agro'));
+  else if(S.mseg==='Azulim') list = list.filter(c=>c.segment.includes('Azulim'));
+  else if(S.mseg==='VIP') list = list.filter(c=>c.badge==='Ouro');
+  else if(S.mseg==='Novos') list = [];
+
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">Minha carteira</h2>
+  <div class="muted" style="font-size:12px;margin-bottom:10px;">${CLIENTS.length} clientes · visão comercial</div>
+  <div class="m-filters">${filters.map(f=>`<button class="chip ${S.mfilter===f?'active':''}" data-go='{"mfilter":"${f}"}'>${f}</button>`).join('')}</div>
+  <div class="m-filters">${segs.map(s=>`<button class="chip ${S.mseg===s?'active':''}" data-go='{"mseg":${S.mseg===s?'null':`"${s}"`}}'>${s}</button>`).join('')}</div>
+  ${list.length? list.map(c=>`<div class="client-card ${c.churn==='Alta'?'risk':''}" data-go='{"mscreen":"c360","clientId":"${c.id}"}'>
+    <div class="score">${c.score}</div>
+    <div class="info"><b>${c.name}</b><span>${c.segment} · ${c.cidade}</span></div>
+    <div class="metrics"><b>${c.fat}</b>${c.ultimoPedidoDias}d · ${c.tendencia==='up'?'▲':c.tendencia==='down'?'▼':'▬'}</div>
+  </div>`).join('') : `<div class="m-card" style="text-align:center;color:var(--gray-600);padding:26px 14px;">Nenhum cliente nesse filtro.</div>`}
+  `;
+}
+
+function mAgenda(){
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">Agenda de hoje</h2>
+  <div class="muted" style="font-size:12px;margin-bottom:10px;">Seg, 29 jun · 12 visitas · rota otimizada</div>
+  <div class="route-box"><div class="badge2">◉ 42 km · 6 paradas</div></div>
+  ${AGENDA.map(a=>{ const done = APP.visits[a.id]==='done'; return `<div class="agenda-stop">
+    <div class="num" style="${done?'background:var(--green);':''}">${done?'✓':a.num}</div>
+    <div class="info"><b>${a.nome}</b><span>${a.hora} · ${a.km} · ${a.tag}</span></div>
+    ${done?`<span class="done-badge">Concluída</span>`:`<button class="btn sm" data-go='{"mscreen":"visita","clientId":"${a.id}"}'>Iniciar</button>`}
+  </div>`;}).join('')}
+  `;
+}
+
+function mAzulIA(){
+  return `
+  <h2 style="margin:2px 0 12px;font-size:16px;">✦ Azul<span class="brand-ia">IA</span> — central de ações</h2>
+  <div class="m-card" data-go='{"mscreen":"reativacao"}' style="cursor:pointer;">
+    <b style="display:block;font-size:13.5px;margin-bottom:3px;">↻ Reativação de base</b>
+    <span class="muted" style="font-size:12px;">6 clientes de alta rentabilidade priorizados →</span>
+  </div>
+  <div class="m-card" data-go='{"mscreen":"risco"}' style="cursor:pointer;">
+    <b style="display:block;font-size:13.5px;margin-bottom:3px;">◉ Semáforo de churn</b>
+    <span class="muted" style="font-size:12px;">8 contas em risco na sua carteira →</span>
+  </div>
+  <div class="m-card" data-go='{"mscreen":"novolead"}' style="cursor:pointer;">
+    <b style="display:block;font-size:13.5px;margin-bottom:3px;">+ Cadastrar novo lead</b>
+    <span class="muted" style="font-size:12px;">Qualificação assistida por IA em campo →</span>
+  </div>
+  <div class="m-card" data-go='{"mscreen":"home","mhome":"foco"}' style="cursor:pointer;">
+    <b style="display:block;font-size:13.5px;margin-bottom:3px;">⚡ Foco do dia</b>
+    <span class="muted" style="font-size:12px;">5 ações ordenadas por impacto e urgência →</span>
+  </div>
+  ${APP.activities.length? `<div class="activity-feed"><h4>Últimas ações</h4>${APP.activities.map(a=>`<div class="activity-item"><span class="dot"></span><div>${a.msg} <span class="muted" style="font-size:11px;">${a.time}</span></div></div>`).join('')}</div>` : ''}
+  `;
+}
+
+function mRisco(){
+  const risk = CLIENTS.filter(c=>c.riscoMotivos);
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">Clientes em risco</h2>
+  <div class="muted" style="font-size:12px;margin-bottom:12px;">Semáforo de churn · AzulIA</div>
+  ${risk.map(c=>{ const done = APP.doneRisk.includes(c.id); return `<div class="risk-card ${c.churnPct<75?'amber':''} ${done?'is-done':''}">
+    <div class="top"><div><h4>${c.name}</h4><span class="seg">${c.segment} · sem compra há ${c.ultimoPedidoDias} dias</span></div><div class="pct">${c.churnPct}%<div style="font-size:9px;font-weight:700;color:var(--gray-600);">CHURN</div></div></div>
+    <ul>${c.riscoMotivos.map(m=>`<li>${m}</li>`).join('')}</ul>
+    <div class="actions">
+      <button class="btn ghost sm" data-go='{"mscreen":"c360","clientId":"${c.id}"}'>Ver 360º</button>
+      ${done?`<span class="done-badge" style="flex:1;justify-content:center;">✓ Ação registrada</span>`:`<button class="btn sm" data-action="mark-risk" data-id="${c.id}" data-label="${c.name}">Agir agora</button>`}
+    </div>
+  </div>`;}).join('')}
+  `;
+}
+
+function mReativacao(){
+  const list = CLIENTS.filter(c=>c.reativacao);
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">Reativação</h2>
+  <div class="muted" style="font-size:12px;margin-bottom:12px;">Inativos de alta rentabilidade · priorizados por AzulIA</div>
+  ${list.map(c=>{ const done = APP.doneReact.includes(c.id); return `<div class="react-card ${done?'is-done':''}">
+    <div class="top"><div><h4>${c.name}</h4><span class="seg">${c.segment} · última compra há ${c.ultimoPedidoDias>=150?Math.round(c.ultimoPedidoDias/30)+' meses':c.ultimoPedidoDias+' dias'}</span></div>
+    <div class="rent ${c.reativacao.rentabilidade==='Alta'?'alta':'media'}">Rentabilidade<br>${c.reativacao.rentabilidade}</div></div>
+    <div class="muted" style="font-size:11.5px;margin-top:8px;">Chance de retorno <b style="color:var(--gray-900)">${c.reativacao.chance}%</b></div>
+    <div class="prob-bar-wrap"><div class="prob-bar" style="width:${c.reativacao.chance}%; background:${c.reativacao.rentabilidade==='Alta'?'var(--green)':'var(--amber)'}"></div></div>
+    <div class="why"><b style="color:var(--gray-900);">Motivo provável:</b> ${c.reativacao.motivo}</div>
+    ${done?`<div class="done-badge" style="justify-content:center;width:100%;">✓ Visita planejada</div>`:`<button class="btn block" data-action="mark-react" data-id="${c.id}" data-label="${c.name}">Planejar visita →</button>`}
+  </div>`;}).join('')}
+  `;
+}
+
+function mCliente360(){
+  const c = byId(S.clientId) || byId('santaclara');
+  return `
+  <div class="c360-head">
+    <div class="row">
+      <div class="score">${c.score}<small>SCORE IA</small></div>
+      <div style="flex:1;"><h2>${c.name}</h2><span class="place">${c.segment} · ${c.cidade}</span></div>
+      <span class="badge ${c.badge.toLowerCase()}">Cliente ${c.badge}</span>
+    </div>
+    <div class="c360-grid">
+      <div class="b"><div class="l">Faturamento</div><div class="v">${c.fat}</div></div>
+      <div class="b"><div class="l">Churn</div><div class="v" style="color:${c.churn==='Baixa'?'var(--green)':c.churn==='Média'?'var(--amber)':'var(--red)'}">${c.churn}</div></div>
+      <div class="b" style="cursor:pointer;" data-go='{"mscreen":"timeline"}'><div class="l">Timeline</div><div class="v" style="color:var(--blue);font-size:12px;">Ver tudo →</div></div>
+    </div>
+  </div>
+  <div class="m-tabs">
+    <button class="${S.c360tab==='ficha'?'active':''}" data-go='{"c360tab":"ficha"}'>Ficha completa</button>
+    <button class="${S.c360tab==='briefing'?'active':''}" data-go='{"c360tab":"briefing"}'>Briefing IA</button>
+  </div>
+  ${S.c360tab==='ficha' ? `
+    <div class="m-subtabs">${['Resumo','Compras','Mix ideal','Financeiro','Oportunidades','Equipe','Concorrentes'].map(s=>`<span class="${S.c360sub===s?'active':''}" data-go='{"c360sub":"${s}"}'>${s}</span>`).join('')}</div>
+    <div class="m-card">
+      <div class="c360-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="b"><div class="l">Ticket médio</div><div class="v">${c.ticket}</div></div>
+        <div class="b"><div class="l">Frequência</div><div class="v">${c.freq}</div></div>
+        <div class="b"><div class="l">Pendências</div><div class="v">${c.pendencias}</div></div>
+        <div class="b"><div class="l">Chamados</div><div class="v">${c.chamados}</div></div>
+      </div>
+    </div>
+    <div class="ia-box"><b>✦ Resumo AzulIA</b>${c.resumo}</div>
+  ` : `
+    <div class="ia-box"><b>✦ Briefing AzulIA para a visita</b>${c.briefing}</div>
+    <div class="c360-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="b"><div class="l">Próx. oportunidade</div><div class="v" style="font-size:12.5px;">${c.oportunidade.nome}</div><span style="font-size:11px;color:var(--green);font-weight:700;">${c.oportunidade.valor}</span></div>
+      <div class="b"><div class="l">Renovação</div><div class="v" style="font-size:12.5px;">${c.renovacao.valor}</div><span style="font-size:11px;color:var(--gray-600);">${c.renovacao.data}</span></div>
+      <div class="b"><div class="l">Pagamento</div><div class="v" style="font-size:12.5px;color:${c.pagamento.status==='Em dia'?'var(--green)':'var(--red)'}">${c.pagamento.status}</div><span style="font-size:11px;color:var(--gray-600);">títulos ${c.pagamento.titulos}</span></div>
+      <div class="b"><div class="l">Último pedido</div><div class="v" style="font-size:12.5px;">há ${c.ultimoPedidoDias} dias</div><span style="font-size:11px;color:var(--gray-600);">${c.ultimoPedidoValor}</span></div>
+    </div>
+    <button class="btn block" style="margin-top:12px;" data-go='{"mscreen":"visita","clientId":"${c.id}"}'>Iniciar visita →</button>
+  `}
+  `;
+}
+
+function mTimeline(){
+  const c = byId(S.clientId) || byId('santaclara');
+  const groups = Object.keys(c.timeline||{});
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">Timeline</h2>
+  <div class="muted" style="font-size:12px;margin-bottom:14px;">${c.name}</div>
+  ${groups.length? groups.map(g=>`<div class="timeline-group"><h5>${g}</h5>
+    ${c.timeline[g].map(t=>`<div class="t-item"><div class="ic">${t.ic}</div><div class="body"><b>${t.titulo}</b><span>${t.desc}</span></div><div class="time">${t.hora}</div></div>`).join('')}
+  </div>`).join('') : `<div class="m-card" style="text-align:center;color:var(--gray-600);padding:20px;">Sem eventos recentes.</div>`}
+  `;
+}
+
+const WIZ_LABELS = ['Check-in','Cliente','Objetivo','Produtos','Pedido','Observações','Fotos','Resumo'];
+const WIZ_OBJETIVOS = ['Apresentar lançamento','Renovação de contrato','Cross-sell de mix','Cobrança / financeiro'];
+const WIZ_PRODUTOS = ['Asseptgel Pro','Linha Azulim Concentrado','Adjuvante Aderix','Vernissage','Oral Care Remin'];
+
+function mVisita(){
+  const c = byId(S.clientId) || byId('santaclara');
+  const step = S.wiz.step;
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">${c.name} <span class="offline-badge">● OFFLINE</span></h2>
+  <div class="muted" style="font-size:12px;margin-bottom:14px;">Passo ${step+1} de 8 · ${WIZ_LABELS[step]}</div>
+  <div class="step-dots">${WIZ_LABELS.map((_,i)=>`<i class="${i<=step?'on':''}"></i>`).join('')}</div>
+  ${wizStepBody(c, step)}
+  <div style="display:flex;gap:10px;margin-top:16px;">
+    <button class="btn ghost" style="flex:1;" data-action="wiz-back">${step===0?'Sair':'Voltar'}</button>
+    ${step<7 ? `<button class="btn" style="flex:2;" data-action="wiz-next">Avançar</button>` : `<button class="btn" style="flex:2;" data-action="wiz-finish">Concluir visita ✓</button>`}
+  </div>
+  `;
+}
+
+function wizStepBody(c, step){
+  if(step===0){
+    return `<div class="m-card" style="text-align:center;padding:26px 14px;">
+      <div style="font-size:30px;margin-bottom:10px;">📍</div>
+      <p style="font-weight:700;margin:0 0 4px;">Check-in no local</p>
+      <p class="muted" style="font-size:12.5px;margin:0;">GPS confirmado · ${c.cidade}</p>
+    </div>`;
+  }
+  if(step===1){
+    return `<div class="client-card"><div class="score">${c.score}</div><div class="info"><b>${c.name}</b><span>${c.segment} · ${c.cidade}</span></div><div class="metrics"><b>${c.fat}</b>Cliente ${c.badge}</div></div>
+    <div class="ia-box"><b>✦ Briefing rápido</b>${c.briefing}</div>`;
+  }
+  if(step===2){
+    return WIZ_OBJETIVOS.map((o,i)=>`<div class="radio-row ${S.wiz.objetivo===i?'sel':''}" data-action="wiz-obj" data-val="${i}">${o}<span class="radio-dot"></span></div>`).join('');
+  }
+  if(step===3){
+    return `<p class="muted" style="font-size:12.5px;margin:0 0 10px;">Selecione os produtos apresentados na visita.</p>
+    <div class="wiz-chip-grid">${WIZ_PRODUTOS.map(p=>`<span class="wiz-chip ${S.wiz.produtos.includes(p)?'sel':''}" data-action="wiz-toggle-prod" data-val="${p}">${p}</span>`).join('')}</div>`;
+  }
+  if(step===4){
+    if(!S.wiz.produtos.length) return `<div class="m-card" style="text-align:center;color:var(--gray-600);padding:16px;">Volte ao passo anterior e selecione produtos.</div>`;
+    let total = 0;
+    const rows = S.wiz.produtos.map(p=>{
+      const q = S.wiz.qtd[p]||0; total += q;
+      return `<div class="qty-row"><span style="font-size:13px;font-weight:600;">${p}</span>
+        <div class="qty-controls"><button class="qty-btn" data-action="wiz-qty" data-val="${p}" data-delta="-1">−</button><b>${q}</b><button class="qty-btn" data-action="wiz-qty" data-val="${p}" data-delta="1">+</button></div></div>`;
+    }).join('');
+    return rows + `<div style="text-align:right;margin-top:10px;font-size:13px;font-weight:800;">Total de itens no pedido: ${total}</div>`;
+  }
+  if(step===5){
+    return `<div class="field"><label>Observações da visita</label><textarea id="wizObs" placeholder="Ex.: cliente pediu prazo maior para pagamento...">${S.wiz.obs||''}</textarea></div>`;
+  }
+  if(step===6){
+    return `<p class="muted" style="font-size:12.5px;margin:0 0 10px;">Anexe fotos da visita (loja, gôndola, prova de entrega).</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      ${Array.from({length:S.wiz.fotos}).map(()=>`<div class="photo-slot">📷</div>`).join('')}
+      <div class="photo-slot" data-action="wiz-photo">+</div>
+    </div>
+    <p class="muted" style="font-size:11.5px;margin-top:10px;">${S.wiz.fotos} foto(s) anexada(s)</p>`;
+  }
+  if(step===7){
+    return `<div class="m-card">
+      <div class="wiz-summary-row"><span class="muted">Objetivo</span><b>${S.wiz.objetivo!=null?WIZ_OBJETIVOS[S.wiz.objetivo]:'-'}</b></div>
+      <div class="wiz-summary-row"><span class="muted">Produtos apresentados</span><b>${S.wiz.produtos.length||0}</b></div>
+      <div class="wiz-summary-row"><span class="muted">Itens no pedido</span><b>${Object.values(S.wiz.qtd).reduce((a,b)=>a+b,0)}</b></div>
+      <div class="wiz-summary-row"><span class="muted">Fotos anexadas</span><b>${S.wiz.fotos}</b></div>
+      <div class="wiz-summary-row" style="border-bottom:0;"><span class="muted">Observações</span><b style="text-align:right;max-width:60%;">${S.wiz.obs||'-'}</b></div>
+    </div>`;
+  }
+  return '';
+}
+
+function mNovoLead(){
+  const segs = ['Varejo','Institucional','Agro','Pet','Cosméticos','Food service'];
+  return `
+  <h2 style="margin:2px 0 2px;font-size:16px;">Novo lead</h2>
+  <div class="muted" style="font-size:12px;margin-bottom:14px;">Cadastro rápido em campo</div>
+  <div class="field"><label>Nome do contato</label><input id="leadNome" placeholder="Ex.: Marcos Andrade"></div>
+  <div class="field"><label>Empresa</label><input id="leadEmpresa" placeholder="Ex.: Supermercado ABC"></div>
+  <div style="display:flex;gap:10px;">
+    <div class="field" style="flex:1;"><label>Canal</label><input id="leadCanal" placeholder="Distribuidor"></div>
+    <div class="field" style="flex:1;"><label>Origem</label><input id="leadOrigem" placeholder="Indicação"></div>
+  </div>
+  <div class="field"><label>Segmento</label><div class="chip-grid">${segs.map(s=>`<span class="chip ${S.leadSeg===s?'active':''}" data-action="toggle-lead-seg" data-val="${s}">${s}</span>`).join('')}</div></div>
+  <div class="ia-box"><b>✦ AzulIA sugere</b>Este lead parece com <b>Supermercado BomPreço</b> (mesmo porte e região). Mix recomendado: linha Azulim + condição 28dd. Potencial estimado: <b>R$ 180k/ano</b>.</div>
+  <button class="btn block" data-action="save-lead">Salvar e qualificar lead</button>
+  ${APP.leads.length? `<div class="activity-feed"><h4>Leads criados nesta sessão</h4>${APP.leads.map(l=>`<div class="activity-item"><span class="dot"></span><div><b>${l.empresa}</b> — ${l.nome}${l.segmento?' · '+l.segmento:''} <span class="muted" style="font-size:11px;">(${l.hora})</span></div></div>`).join('')}</div>` : ''}
+  `;
+}
+
+/* ============================= EVENTS ============================= */
+document.addEventListener('click', (e)=>{
+  const goEl = e.target.closest('[data-go]');
+  if(goEl){ go(JSON.parse(goEl.getAttribute('data-go'))); return; }
+  const actionEl = e.target.closest('[data-action]');
+  if(actionEl){
+    const action = actionEl.getAttribute('data-action');
+    if(action==='login') return doLogin();
+    if(action==='logout') return doLogout();
+    if(action==='mark-foco') return markFocoDone(actionEl);
+    if(action==='mark-react') return markReactDone(actionEl);
+    if(action==='mark-risk') return markRiskDone(actionEl);
+    if(action==='save-lead') return saveLead();
+    if(action==='toggle-lead-seg'){ S.leadSeg = (S.leadSeg===actionEl.getAttribute('data-val')) ? null : actionEl.getAttribute('data-val'); render(); return; }
+    if(action==='wiz-next') return wizNext();
+    if(action==='wiz-back') return wizBack();
+    if(action==='wiz-finish') return wizFinish();
+    if(action==='wiz-obj'){ S.wiz.objetivo = parseInt(actionEl.getAttribute('data-val')); render(); return; }
+    if(action==='wiz-toggle-prod') return wizToggleProd(actionEl.getAttribute('data-val'));
+    if(action==='wiz-qty') return wizQty(actionEl.getAttribute('data-val'), parseInt(actionEl.getAttribute('data-delta')));
+    if(action==='wiz-photo') return wizPhoto();
+    return;
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && !AUTH.loggedIn && (e.target.id==='loginUser'||e.target.id==='loginPass')) doLogin();
+});
+document.addEventListener('input', (e)=>{
+  if(e.target.id==='wizObs'){ S.wiz.obs = e.target.value; }
+});
+
+render();
+</script>
+</html>
