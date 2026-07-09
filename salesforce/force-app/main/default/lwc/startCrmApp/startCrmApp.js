@@ -1,5 +1,7 @@
 import { LightningElement, track, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import getAccounts from '@salesforce/apex/StartCrmController.getAccounts';
+import createAccount from '@salesforce/apex/StartCrmController.createAccount';
 import getRcaDetail from '@salesforce/apex/StartCrmController.getRcaDetail';
 import getOpportunityDetail from '@salesforce/apex/StartCrmController.getOpportunityDetail';
 import STARTLOGO from '@salesforce/resourceUrl/startLogo';
@@ -96,18 +98,61 @@ export default class StartCrmApp extends LightningElement {
 
     periods = ['Mês', 'Trimestre', 'Ano'];
 
+    _accountsWireResult;
     @wire(getAccounts)
-    wiredAccounts({ data, error }) {
-        if (data) {
-            this.realAccounts = data;
+    wiredAccounts(result) {
+        this._accountsWireResult = result;
+        if (result.data) {
+            this.realAccounts = result.data;
             this.accountsError = undefined;
-        } else if (error) {
-            this.accountsError = error;
+        } else if (result.error) {
+            this.accountsError = result.error;
             this.realAccounts = [];
         }
     }
 
     get hasRealAccounts() { return this.realAccounts && this.realAccounts.length > 0; }
+
+    // ---------- nova conta (create Account) ----------
+    get isNovaConta() { return this.dpage === 'novaConta'; }
+    @track novaContaForm = { name: '', city: '', state: '', industry: '', annualRevenue: '' };
+    @track novaContaSalvando = false;
+    @track novaContaErro = null;
+    @track novaContaSucesso = null;
+
+    handleNovaContaInput(event) {
+        const field = event.currentTarget.dataset.field;
+        this.novaContaForm = { ...this.novaContaForm, [field]: event.currentTarget.value };
+    }
+
+    async handleSalvarConta() {
+        if (!this.novaContaForm.name || !this.novaContaForm.name.trim()) {
+            this.novaContaErro = 'Informe o nome da conta.';
+            this.novaContaSucesso = null;
+            return;
+        }
+        this.novaContaSalvando = true;
+        this.novaContaErro = null;
+        this.novaContaSucesso = null;
+        try {
+            await createAccount({
+                name: this.novaContaForm.name.trim(),
+                city: this.novaContaForm.city,
+                state: this.novaContaForm.state,
+                industry: this.novaContaForm.industry,
+                annualRevenue: this.novaContaForm.annualRevenue ? Number(this.novaContaForm.annualRevenue) : null,
+            });
+            this.novaContaSucesso = `Conta "${this.novaContaForm.name.trim()}" criada com sucesso.`;
+            this.novaContaForm = { name: '', city: '', state: '', industry: '', annualRevenue: '' };
+            if (this._accountsWireResult) {
+                await refreshApex(this._accountsWireResult);
+            }
+        } catch (e) {
+            this.novaContaErro = e?.body?.message || e?.message || 'Não foi possível criar a conta.';
+        } finally {
+            this.novaContaSalvando = false;
+        }
+    }
     get hasAccountsError() { return !!this.accountsError; }
 
     formatCurrency(v) {

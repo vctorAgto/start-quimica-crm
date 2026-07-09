@@ -155,8 +155,10 @@
                     </div>
 
                     <div class="card mt14">
-                        <h3>Contas reais desta org (Salesforce)</h3>
-                        <div class="subtitle">Registros ao vivo via Apex · objeto Account</div>
+                        <div class="content-header" style="padding:0 0 6px;">
+                            <div><h3>Contas reais desta org (Salesforce)</h3><div class="subtitle">Registros ao vivo via Apex · objeto Account</div></div>
+                            <button class="btn sm" data-page="novaConta" onclick={handleNav}>+ Nova conta</button>
+                        </div>
                         <template if:true={hasRealAccounts}>
                             <table>
                                 <thead><tr><th>Conta</th><th>Cidade/UF</th><th>Segmento</th><th>Faturamento</th></tr></thead>
@@ -178,6 +180,53 @@
                         <template if:true={hasAccountsError}>
                             <p class="muted small">Não foi possível carregar as contas — verifique se o usuário da comunidade tem permissão de leitura em Account e acesso à classe Apex StartCrmController.</p>
                         </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ============ NOVA CONTA (create Account) ============ -->
+            <template if:true={isNovaConta}>
+                <div class="content-header">
+                    <div><h1>Nova conta</h1><div class="meta">Cadastro real no Salesforce · objeto Account</div></div>
+                    <button class="btn ghost" data-page="equipe" onclick={handleNav}>← Voltar</button>
+                </div>
+                <div class="content-body">
+                    <div class="card nc-card">
+                        <h3>Dados da conta</h3>
+                        <div class="subtitle">Campos básicos — mais detalhes podem ser adicionados depois no Salesforce</div>
+
+                        <div class="field-nc">
+                            <label>Nome da conta *</label>
+                            <input type="text" value={novaContaForm.name} data-field="name" oninput={handleNovaContaInput} placeholder="Ex.: Supermercado ABC" />
+                        </div>
+                        <div class="field-nc">
+                            <label>Cidade</label>
+                            <input type="text" value={novaContaForm.city} data-field="city" oninput={handleNovaContaInput} placeholder="Ex.: Uberlândia" />
+                        </div>
+                        <div class="field-nc">
+                            <label>Estado (UF)</label>
+                            <input type="text" value={novaContaForm.state} data-field="state" oninput={handleNovaContaInput} placeholder="Ex.: MG" />
+                        </div>
+                        <div class="field-nc">
+                            <label>Segmento</label>
+                            <input type="text" value={novaContaForm.industry} data-field="industry" oninput={handleNovaContaInput} placeholder="Ex.: Varejo" />
+                        </div>
+                        <div class="field-nc">
+                            <label>Faturamento anual estimado</label>
+                            <input type="number" value={novaContaForm.annualRevenue} data-field="annualRevenue" oninput={handleNovaContaInput} placeholder="Ex.: 500000" />
+                        </div>
+
+                        <template if:true={novaContaErro}>
+                            <div class="nc-error">{novaContaErro}</div>
+                        </template>
+                        <template if:true={novaContaSucesso}>
+                            <div class="nc-success">{novaContaSucesso}</div>
+                        </template>
+
+                        <button class="btn block" onclick={handleSalvarConta} disabled={novaContaSalvando}>
+                            <template if:true={novaContaSalvando}>Salvando...</template>
+                            <template if:false={novaContaSalvando}>Salvar conta →</template>
+                        </button>
                     </div>
                 </div>
             </template>

@@ -1,4 +1,24 @@
 public with sharing class StartCrmController {
+    @AuraEnabled
+    public static Id createAccount(String name, String city, String state, String industry, Decimal annualRevenue) {
+        if (String.isBlank(name)) {
+            throw new AuraHandledException('Informe o nome da conta.');
+        }
+        try {
+            Account acc = new Account(
+                Name = name,
+                BillingCity = city,
+                BillingState = state,
+                Industry = industry,
+                AnnualRevenue = annualRevenue
+            );
+            insert acc;
+            return acc.Id;
+        } catch (DmlException ex) {
+            throw new AuraHandledException(ex.getDmlMessage(0));
+        }
+    }
+
     @AuraEnabled(cacheable=true)
     public static List<Account> getAccounts() {
         return [
