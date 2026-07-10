@@ -150,7 +150,10 @@
 
             <!-- ============ EQUIPE & CARTEIRA ============ -->
             <template if:true={isEquipe}>
-                <div class="content-header"><div><h1>Equipe &amp; carteira</h1><div class="meta">4 Diretores Regionais · 60 Gerentes de Mercado · 750 RCAs</div></div></div>
+                <div class="content-header">
+                    <div><h1>Equipe &amp; carteira</h1><div class="meta">4 Diretores Regionais · 60 Gerentes de Mercado · 750 RCAs</div></div>
+                    <button class="btn sm" data-page="novaConta" onclick={handleNav}>+ Nova conta</button>
+                </div>
                 <div class="content-body">
                     <div class="card">
                         <h3>Região Triângulo Mineiro</h3><div class="subtitle">18 RCAs sob gestão de Carlos Eduardo (Gerente de Mercado)</div>
@@ -170,33 +173,6 @@
                         </table>
                     </div>
 
-                    <div class="card mt14">
-                        <div class="content-header" style="padding:0 0 6px;">
-                            <div><h3>Contas reais desta org (Salesforce)</h3><div class="subtitle">Registros ao vivo via Apex · objeto Account</div></div>
-                            <button class="btn sm" data-page="novaConta" onclick={handleNav}>+ Nova conta</button>
-                        </div>
-                        <template if:true={hasRealAccounts}>
-                            <table>
-                                <thead><tr><th>Conta</th><th>Cidade/UF</th><th>Segmento</th><th>Faturamento</th></tr></thead>
-                                <tbody>
-                                    <template for:each={realAccountsView} for:item="a">
-                                        <tr key={a.Id}>
-                                            <td><b>{a.Name}</b></td>
-                                            <td class="muted">{a.location}</td>
-                                            <td>{a.industry}</td>
-                                            <td>{a.revenue}</td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </template>
-                        <template if:false={hasRealAccounts}>
-                            <p class="muted small">Nenhuma conta encontrada nesta org. Crie algumas Accounts de teste no Salesforce pra elas aparecerem aqui automaticamente.</p>
-                        </template>
-                        <template if:true={hasAccountsError}>
-                            <p class="muted small">Não foi possível carregar as contas — verifique se o usuário da comunidade tem permissão de leitura em Account e acesso à classe Apex StartCrmController.</p>
-                        </template>
-                    </div>
                 </div>
             </template>
 
@@ -289,13 +265,37 @@
                             <h3 class="h3-sm">✦ Oportunidades de prospecção</h3>
                             <div class="subtitle">Mapeamento AzulIA · alta propensão de conversão</div>
                             <template for:each={prospeccoes} for:item="o">
-                                <div key={o.nome} class="prospect-row">
-                                    <div class="prospect-top"><b>{o.nome}</b><span class="prospect-valor">{o.valor}</span></div>
+                                <div key={o.nome} class="prospect-row clickable" data-lead-id={o.sfId} onclick={handleOpenLead}>
+                                    <div class="prospect-top"><b class="link">{o.nome}</b><span class="prospect-valor">{o.valor}</span></div>
                                     <div class="muted small">{o.cidade} · {o.motivo}</div>
                                 </div>
                             </template>
                         </div>
                     </div>
+                </div>
+            </template>
+
+            <!-- ============ LEAD DETAIL (real Salesforce data) ============ -->
+            <template if:true={isLeadDetail}>
+                <div class="content-header">
+                    <div><h1>Detalhe do Lead</h1><div class="meta">Dados reais do Salesforce · objeto Lead</div></div>
+                    <button class="btn ghost" data-page="mapa" onclick={handleNav}>← Voltar ao mapa</button>
+                </div>
+                <div class="content-body">
+                    <template if:true={hasLeadDetail}>
+                        <div class="card nc-card">
+                            <h3>{leadDetail.company}</h3>
+                            <div class="subtitle">{leadDetail.city}/{leadDetail.state}</div>
+                            <div class="grid3-box" style="grid-template-columns:1fr 1fr;">
+                                <div class="b"><div class="l">Status</div><div class="v">{leadDetail.status}</div></div>
+                                <div class="b"><div class="l">Origem</div><div class="v">Mapeamento AzulIA</div></div>
+                            </div>
+                            <div class="mt12"><span class="muted small">Descrição</span><div>{leadDetail.description}</div></div>
+                        </div>
+                    </template>
+                    <template if:false={hasLeadDetail}>
+                        <div class="card"><p class="muted small">Carregando dados do Salesforce...</p></div>
+                    </template>
                 </div>
             </template>
 

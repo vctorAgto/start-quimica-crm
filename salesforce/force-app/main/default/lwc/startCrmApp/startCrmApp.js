@@ -1,10 +1,9 @@
 import { LightningElement, track, wire } from 'lwc';
-import { refreshApex } from '@salesforce/apex';
-import getAccounts from '@salesforce/apex/StartCrmController.getAccounts';
 import createAccount from '@salesforce/apex/StartCrmController.createAccount';
 import getCurrentUserInfo from '@salesforce/apex/StartCrmController.getCurrentUserInfo';
 import getRcaDetail from '@salesforce/apex/StartCrmController.getRcaDetail';
 import getOpportunityDetail from '@salesforce/apex/StartCrmController.getOpportunityDetail';
+import getLeadDetail from '@salesforce/apex/StartCrmController.getLeadDetail';
 import STARTLOGO from '@salesforce/resourceUrl/startLogo';
 
 const STATUS_META = {
@@ -80,9 +79,9 @@ const MAPA_PONTOS = [
 ];
 
 const PROSPECCOES = [
-    { nome: 'Supermercado ABC', cidade: 'Araguari/MG', motivo: 'Sem fornecedor ativo da categoria', valor: 'R$ 180k/ano' },
-    { nome: 'Mercado Bom Preço', cidade: 'Uberaba/MG', motivo: 'Mesmo porte de contas Azulim ativas na região', valor: 'R$ 140k/ano' },
-    { nome: 'Rede Center Farma', cidade: 'Uberlândia/MG', motivo: 'Alta propensão por perfil de compra similar', valor: 'R$ 95k/ano' },
+    { nome: 'Supermercado ABC', cidade: 'Araguari/MG', motivo: 'Sem fornecedor ativo da categoria', valor: 'R$ 180k/ano', sfId: '00Qak00000ltvvVEAQ' },
+    { nome: 'Mercado Bom Preço', cidade: 'Uberaba/MG', motivo: 'Mesmo porte de contas Azulim ativas na região', valor: 'R$ 140k/ano', sfId: '00Qak00000ltvvWEAQ' },
+    { nome: 'Rede Center Farma', cidade: 'Uberlândia/MG', motivo: 'Alta propensão por perfil de compra similar', valor: 'R$ 95k/ano', sfId: '00Qak00000ltvvXEAQ' },
 ];
 
 export default class StartCrmApp extends LightningElement {
@@ -120,25 +119,8 @@ export default class StartCrmApp extends LightningElement {
     @track mapaSel = null;
     @track doneRecos = [];
     @track activities = [];
-    @track realAccounts = [];
-    @track accountsError;
 
     periods = ['Mês', 'Trimestre', 'Ano'];
-
-    _accountsWireResult;
-    @wire(getAccounts)
-    wiredAccounts(result) {
-        this._accountsWireResult = result;
-        if (result.data) {
-            this.realAccounts = result.data;
-            this.accountsError = undefined;
-        } else if (result.error) {
-            this.accountsError = result.error;
-            this.realAccounts = [];
-        }
-    }
-
-    get hasRealAccounts() { return this.realAccounts && this.realAccounts.length > 0; }
 
     // ---------- nova conta (create Account) ----------
     get isNovaConta() { return this.dpage === 'novaConta'; }
@@ -171,29 +153,15 @@ export default class StartCrmApp extends LightningElement {
             });
             this.novaContaSucesso = `Conta "${this.novaContaForm.name.trim()}" criada com sucesso.`;
             this.novaContaForm = { name: '', city: '', state: '', industry: '', annualRevenue: '' };
-            if (this._accountsWireResult) {
-                await refreshApex(this._accountsWireResult);
-            }
         } catch (e) {
             this.novaContaErro = e?.body?.message || e?.message || 'Não foi possível criar a conta.';
         } finally {
             this.novaContaSalvando = false;
         }
     }
-    get hasAccountsError() { return !!this.accountsError; }
 
     formatCurrency(v) {
         return 'R$ ' + Number(v).toLocaleString('pt-BR');
-    }
-
-    get realAccountsView() {
-        return this.realAccounts.map((a) => ({
-            Id: a.Id,
-            Name: a.Name,
-            location: [a.BillingCity, a.BillingState].filter(Boolean).join('/') || '—',
-            industry: a.Industry || '—',
-            revenue: a.AnnualRevenue ? this.formatCurrency(a.AnnualRevenue) : '—',
-        }));
     }
 
     nowHM() {
@@ -365,6 +333,25 @@ export default class StartCrmApp extends LightningElement {
     get hasOppActivities() { return this.oppActivitiesView.length > 0; }
     get oppAmountFmt() {
         return this.oppDetail && this.oppDetail.amount ? this.formatCurrency(this.oppDetail.amount) : '—';
+    }
+
+    // ---------- lead detail (real Salesforce data) ----------
+    get isLeadDetail() { return this.dpage === 'leadDetail'; }
+    @track selectedLeadId = null;
+    @track leadDetail = null;
+
+    @wire(getLeadDetail, { leadId: '$selectedLeadId' })
+    wiredLeadDetail({ data, error }) {
+        if (data) {
+            this.leadDetail = data;
+        } else if (error) {
+            this.leadDetail = null;
+        }
+    }
+    get hasLeadDetail() { return !!this.leadDetail; }
+    handleOpenLead(event) {
+        this.selectedLeadId = event.currentTarget.dataset.leadId;
+        this.dpage = 'leadDetail';
     }
 
     // ---------- mapa de mercado ----------

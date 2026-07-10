@@ -229,5 +229,7 @@ tr:last-child td { border-bottom: 0; }
 .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
 .detail-row.no-border { border-bottom: 0; }
 .prospect-row { padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+.prospect-row.clickable { cursor: pointer; }
+.prospect-row.clickable:hover { background: var(--gray-50); }
 .prospect-top { display: flex; justify-content: space-between; gap: 10px; }
 .prospect-valor { font-size: 12px; font-weight: 800; color: var(--green); white-space: nowrap; }

@@ -177,4 +177,38 @@ public without sharing class StartCrmController {
         w.activities = tasks;
         return w;
     }
+
+    public class LeadDetailWrapper {
+        @AuraEnabled public String leadId;
+        @AuraEnabled public String company;
+        @AuraEnabled public String city;
+        @AuraEnabled public String state;
+        @AuraEnabled public String status;
+        @AuraEnabled public String description;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static LeadDetailWrapper getLeadDetail(Id leadId) {
+        if (leadId == null) {
+            return null;
+        }
+        List<Lead> matches = [
+            SELECT Id, Company, City, State, Status, Description
+            FROM Lead
+            WHERE Id = :leadId
+            LIMIT 1
+        ];
+        if (matches.isEmpty()) {
+            return null;
+        }
+        Lead l = matches[0];
+        LeadDetailWrapper w = new LeadDetailWrapper();
+        w.leadId = l.Id;
+        w.company = l.Company;
+        w.city = l.City;
+        w.state = l.State;
+        w.status = l.Status;
+        w.description = l.Description;
+        return w;
+    }
 }
