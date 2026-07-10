@@ -2,6 +2,10 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>Start CRM Admin</label>
     <hasActivationRequired>false</hasActivationRequired>
+    <classAccesses>
+        <apexClass>StartCrmController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <field>Contact.CPF__c</field>
         <readable>true</readable>
