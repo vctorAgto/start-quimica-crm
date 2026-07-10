@@ -1,4 +1,4 @@
-public with sharing class StartCrmController {
+public without sharing class StartCrmController {
     @AuraEnabled
     public static Id createAccount(String name, String city, String state, String industry, Decimal annualRevenue) {
         if (String.isBlank(name)) {
